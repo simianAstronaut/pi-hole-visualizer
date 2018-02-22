@@ -50,6 +50,8 @@ def generateChart(data):
         domainInfoChart = domainInfoChart[:8]
 
         sense = SenseHat()
+        sense.clear()
+
         for col in range(0,8):
             if domainInfoChart[col] > 0:
                 for row in range(0,domainInfoChart[col]):
