@@ -22,6 +22,18 @@ def dns_request():
         domainInfoHourly = domainInfoHourly[:24]
         return domainInfoHourly
 
+def colorDict(x):
+    return {
+        1 : (0,128,255),
+        2 : (0,255,255),
+        3 : (255,128,0),
+        4 : (0,255,0),
+        5 : (128,255,0),
+        6 : (255,255,0),
+        7 : (255,128,0),
+        8 : (255,0,0),
+    }[x]
+
 def generateChart(data):
         domainInfoChart = []
         min = data[0][0]
@@ -41,9 +53,8 @@ def generateChart(data):
         for col in range(0,8):
             if domainInfoChart[col] > 0:
                 for row in range(0,domainInfoChart[col]):
-                    sense.set_pixel(row,col,255,0,0)
+                    sense.set_pixel(row,col,colorDict(domainInfoChart[col]))
         
-        print(domainInfoChart)
 def main():
     domainInfoHourly = dns_request()
     generateChart(domainInfoHourly)
