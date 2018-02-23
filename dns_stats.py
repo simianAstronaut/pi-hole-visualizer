@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import optparse
 import urllib.request, json
 from sense_hat import SenseHat
 
@@ -34,7 +35,7 @@ def colorDict(x):
         8 : (255,0,0),
     }[x]
 
-def generateChart(data):
+def generateChart(data, flag):
         domainInfoChart = []
         min = data[0][0]
         max = data[0][0]
@@ -55,11 +56,16 @@ def generateChart(data):
         for col in range(0,8):
             if domainInfoChart[col] > 0:
                 for row in range(0,domainInfoChart[col]):
-                    sense.set_pixel(row,col,colorDict(domainInfoChart[col]))
+                    sense.set_pixel(row,col,colorDict(domainInfoChart[col]) if flag else (255,0,0))
         
 def main():
+    parser = optparse.OptionParser(description='Generates a chart to display network traffic on the sense-hat RGB display')
+    parser.add_option('-c', action="store_true", dest="colorFlag", help="Uses color to indicate level of network traffic")
+    parser.set_defaults(colorFlag=False)
+    opt, args = parser.parse_args()
+
     domainInfoHourly = dns_request()
-    generateChart(domainInfoHourly)
+    generateChart(domainInfoHourly, opt.colorFlag)
 
 if __name__ == '__main__':
     main()
