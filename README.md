@@ -11,4 +11,5 @@ Options:
 To run the script and update the chart continuously (one minute intervals):
 1.  Type 'sudo crontab -e'  
 2.  Append '* * * * * your_file_path/dns_stats.py -c' to the end of the file
-3.  Reboot
+
+![sense-hat display](https://github.com/monkeyWithKeyboard/trafficGraph/blob/master/images/sense-hat_2.jpg)
