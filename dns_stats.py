@@ -3,14 +3,14 @@ import optparse
 import urllib.request, json
 from sense_hat import SenseHat
 
-def dns_request():
+def dns_request(localAddress):
         domainInfo10mins = []
         domainInfoHourly = []
         domains = 0
         ads = 0
 
         #retrieve and decode json data from pi-hole ftl daemon
-        with urllib.request.urlopen("http://192.168.1.200/admin/api.php?overTimeData10mins") as url:
+        with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % localAddress) as url:
                 data = json.loads(url.read().decode())
 
         #sort and reverse data so that latest time intervals appear first in list
@@ -74,11 +74,12 @@ def generateChart(data, flag):
         
 def main():
     parser = optparse.OptionParser(description='Generates a chart to display network traffic on the sense-hat RGB display')
-    parser.add_option('-c', action="store_true", dest="colorFlag", help="Uses color to indicate level of network traffic")
-    parser.set_defaults(colorFlag=False)
+    parser.add_option('-c', action="store_true", dest="colorFlag", help="uses color to indicate level of network traffic")
+    parser.add_option('-a', action="store", dest="localAddress", type="string", help="specify address of DNS server, defaults to localhost")
+    parser.set_defaults(colorFlag=False, localAddress='127.0.0.1')
     opt, args = parser.parse_args()
 
-    domainInfoHourly = dns_request()
+    domainInfoHourly = dns_request(opt.localAddress)
     generateChart(domainInfoHourly, opt.colorFlag)
 
 if __name__ == '__main__':
