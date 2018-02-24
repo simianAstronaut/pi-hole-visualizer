@@ -6,7 +6,7 @@ Generates a chart to display network traffic on the sense-hat RGB display. This 
 Options:  
 &nbsp;&nbsp;-h&nbsp; show this help message and exit  
 &nbsp;&nbsp;-c&nbsp; uses color to indicate level of network traffic  
-
+&nbsp;&nbsp;-a&nbsp; specify address of dns server, defaults to localhost
   
 To run the script and update the chart continuously (one minute intervals):
 1.  Type 'sudo crontab -e'  
