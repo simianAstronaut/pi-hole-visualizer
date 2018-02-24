@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import optparse
+import sys
 import urllib.request, json
 from sense_hat import SenseHat
 
@@ -10,8 +11,12 @@ def dns_request(localAddress):
         ads = 0
 
         #retrieve and decode json data from pi-hole ftl daemon
-        with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % localAddress) as url:
+        try:
+            with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % localAddress) as url:
                 data = json.loads(url.read().decode())
+        except urllib.error.URLError:
+            print("Error: Invalid address for DNS server. Try again.")
+            sys.exit(1)
 
         #sort and reverse data so that latest time intervals appear first in list
         for key in sorted(data['domains_over_time'].keys(), reverse=True):
