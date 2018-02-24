@@ -1,7 +1,7 @@
 # trafficGraph
 Usage: dns_stats.py [options]
 
-Generates a chart to display network traffic on the sense-hat RGB display
+Generates a chart to display network traffic on the sense-hat RGB display. This script utilizes the FTL daemon, a component of the Pi-hole ecosystem, to retrieve statistics about DNS queries. For more information, visit the following [link](https://github.com/pi-hole/FTL)
 
 Options:  
 &nbsp;&nbsp;-h&nbsp; show this help message and exit  
