@@ -79,7 +79,7 @@ def generateChart(data, flag):
         
 def main():
     parser = optparse.OptionParser(description='Generates a chart to display network traffic on the sense-hat RGB display')
-    parser.add_option('-c', action="store_true", dest="colorFlag", help="uses color to indicate level of network traffic")
+    parser.add_option('-c', action="store_true", dest="colorFlag", help="use color to indicate level of network traffic")
     parser.add_option('-a', action="store", dest="localAddress", type="string", help="specify address of DNS server, defaults to localhost")
     parser.set_defaults(colorFlag=False, localAddress='127.0.0.1')
     opt, args = parser.parse_args()
