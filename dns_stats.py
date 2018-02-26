@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+
+'''
+Pi-hole DNS traffic visualizer for the Raspberry Pi Sense HAT
+By Sam Lindley, 2/21/2018
+'''
+
 import sys
 import json
 import optparse
