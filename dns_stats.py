@@ -13,6 +13,7 @@ from sense_hat import SenseHat
 
 def dns_request(address):
     domain_info_hourly = []
+    key_count = 0
     domains = 0
     ads = 0
 
@@ -25,7 +26,6 @@ def dns_request(address):
         print("Error: Invalid address for DNS server. Try again.")
         sys.exit(1)
 
-    key_count = 0
     #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(data['domains_over_time'].keys(), reverse=True):
         #aggregate data into hourly intervals
@@ -100,10 +100,13 @@ def generate_chart(data, color):
                     sense.set_pixel(row, col, (255, 0, 0))
 
 def main():
-    parser = argparse.ArgumentParser(description="Generates a chart to display network traffic on the sense-hat RGB display")
+    parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
+                                     on the sense-hat RGB display")
     parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads"], \
-                        help="specify 'traffic' to display level of network traffic or 'ads' to display percentage of ads blocked")
-    parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify address of DNS server, defaults to localhost")
+                        help="specify 'traffic' to display level of network traffic or 'ads' to \
+                        display percentage of ads blocked")
+    parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
+                        address of DNS server, defaults to localhost")
     args = parser.parse_args()
 
     domain_info_hourly = dns_request(args.address)
