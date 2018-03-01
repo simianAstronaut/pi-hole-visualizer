@@ -7,11 +7,11 @@ By Sam Lindley, 2/21/2018
 
 import sys
 import json
-import optparse
+import argparse
 import urllib.request
 from sense_hat import SenseHat
 
-def dns_request(local_address):
+def dns_request(address):
     domain_info_mins = []
     domain_info_hourly = []
     domains = 0
@@ -20,7 +20,7 @@ def dns_request(local_address):
     #retrieve and decode json data from pi-hole ftl daemon
     try:
         with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
-        local_address) as url:
+        address) as url:
             data = json.loads(url.read().decode())
     except urllib.error.URLError:
         print("Error: Invalid address for DNS server. Try again.")
@@ -102,14 +102,14 @@ def generate_chart(data, color):
                     sense.set_pixel(row, col, (255, 0, 0))
 
 def main():
-    parser = optparse.OptionParser(description="Generates a chart to display network traffic on the sense-hat RGB display")
-    parser.add_option('-c', action="store", type="choice", dest="color", choices=["traffic", "ads"], help="use color to indicate level of network traffic or percentage of ads blocked")
-    parser.add_option('-a', action="store", dest="local_address", type="string", help="specify address of DNS server, defaults to localhost")
-    parser.set_defaults(color=None, local_address='127.0.0.1')
-    opt, args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Generates a chart to display network traffic on the sense-hat RGB display")
+    parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads"], \
+                        help="specify 'traffic' to display level of network traffic or 'ads' to display percentage of ads blocked")
+    parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify address of DNS server, defaults to localhost")
+    args = parser.parse_args()
 
-    domain_info_hourly = dns_request(opt.local_address)
-    generate_chart(domain_info_hourly, opt.color)
+    domain_info_hourly = dns_request(args.address)
+    generate_chart(domain_info_hourly, args.color)
 
 if __name__ == '__main__':
     main()
