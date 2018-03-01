@@ -12,7 +12,6 @@ import urllib.request
 from sense_hat import SenseHat
 
 def dns_request(address):
-    domain_info_mins = []
     domain_info_hourly = []
     domains = 0
     ads = 0
@@ -26,18 +25,17 @@ def dns_request(address):
         print("Error: Invalid address for DNS server. Try again.")
         sys.exit(1)
 
+    key_count = 0
     #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(data['domains_over_time'].keys(), reverse=True):
-        domain_info_mins.append([data['domains_over_time'][key], data['ads_over_time'][key]])
-
-    #aggregate data into hourly intervals
-    for i in range(len(domain_info_mins)):
-        if i > 0 and i % 6 == 0:
+        #aggregate data into hourly intervals
+        if key_count > 0 and key_count % 6 == 0:
             domain_info_hourly.append([domains, (ads / domains) * 100])
             domains = 0
             ads = 0
-        domains += domain_info_mins[i][0]
-        ads += domain_info_mins[i][1]
+        domains += data['domains_over_time'][key]
+        ads += data['ads_over_time'][key]
+        key_count += 1
 
     #extract a slice of the previous 24 hours
     domain_info_hourly = domain_info_hourly[:24]
