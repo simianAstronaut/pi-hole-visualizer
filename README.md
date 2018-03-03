@@ -10,7 +10,8 @@ Options:
 &nbsp;&nbsp;-a ADDRESS, --address ADDRESS&nbsp; specify address of dns server, defaults to localhost
   
 To run the script and update the chart continuously (one minute intervals):
-1.  Type 'sudo crontab -e'  
-2.  Append '* * * * * your_file_path/dns_stats.py [-c {traffic, ads}] [-a ADDRESS]' to the end of the file
+1.  Make the program executable by running 'sudo chmod +x dns_stats.py'
+2.  Type 'sudo crontab -e'  
+3.  Append '* * * * * your_file_path/dns_stats.py [-c {traffic, ads}] [-a ADDRESS]' to the end of the file
   
 ![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense-hat_2.jpg)

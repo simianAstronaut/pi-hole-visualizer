@@ -5,11 +5,11 @@ Pi-hole DNS traffic visualizer for the Raspberry Pi Sense HAT
 By Sam Lindley, 2/21/2018
 '''
 
-import sys
-import json
 import argparse
-import urllib.request
+import json
 from sense_hat import SenseHat
+import sys
+import urllib.request
 
 def dns_request(address):
     domain_info_hourly = []
@@ -42,7 +42,7 @@ def dns_request(address):
 
     return domain_info_hourly
 
-#color codes hourly interval based on relative level of dns traffic
+#color code hourly interval
 def color_dict(level):
     return {
         0 : (0, 0, 255),
@@ -78,7 +78,7 @@ def generate_chart(data, color):
     domain_interval = (domain_max - domain_min) / 8
     ad_interval = (ad_max - ad_min) / 8
 
-    #append final scaled values to new list
+    #append scaled values to new list
     for hour in data:
         info_chart.append([int((hour[0] - domain_min) / domain_interval), \
                                   int((hour[1] - ad_min) / ad_interval)])
@@ -91,7 +91,7 @@ def generate_chart(data, color):
     for col in range(0, 8):
         if info_chart[col][0] > 0:
             for row in range(0, info_chart[col][0]):
-                #if color not set, default to color red for all values
+                #if color not set, default to red for all values
                 if color == 'traffic':
                     sense.set_pixel(row, col, color_dict(info_chart[col][0]))
                 elif color == 'ads':
