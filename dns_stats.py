@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''
 Pi-hole DNS traffic visualizer for the Raspberry Pi Sense HAT
@@ -30,7 +30,7 @@ def dns_request(address):
     for key in sorted(data['domains_over_time'].keys(), reverse=True):
         #aggregate data into hourly intervals
         if key_count > 0 and key_count % 6 == 0:
-            domain_info_hourly.append([domains, (ads / domains) * 100])
+            domain_info_hourly.append([domains, (ads / domains) * 100 if domains > 0 else 0])
             domains = 0
             ads = 0
         domains += data['domains_over_time'][key]
@@ -75,13 +75,13 @@ def generate_chart(data, color):
         elif hour[1] < ad_min:
             ad_min = hour[1]
 
-    domain_interval = (domain_max - domain_min) / 8
+    domain_interval = (domain_max - domain_min) / 8 
     ad_interval = (ad_max - ad_min) / 8
 
     #append scaled values to new list
     for hour in data:
-        info_chart.append([int((hour[0] - domain_min) / domain_interval), \
-                                  int((hour[1] - ad_min) / ad_interval)])
+        info_chart.append([int((hour[0] - domain_min) / domain_interval) if domain_interval > 0 \
+                           else 0, int((hour[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
     info_chart = list(reversed(info_chart[:8]))
 
     sense = SenseHat()
@@ -108,7 +108,7 @@ def main():
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
     args = parser.parse_args()
-
+    
     domain_info_hourly = dns_request(args.address)
     generate_chart(domain_info_hourly, args.color)
 
