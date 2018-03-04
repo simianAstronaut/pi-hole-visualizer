@@ -9,6 +9,7 @@ import argparse
 import json
 from sense_hat import SenseHat
 import sys
+import time
 import urllib.request
 
 def dns_request(address):
@@ -18,13 +19,19 @@ def dns_request(address):
     ads = 0
 
     #retrieve and decode json data from pi-hole ftl daemon
-    try:
-        with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
-        address) as url:
-            data = json.loads(url.read().decode())
-    except urllib.error.URLError:
-        print("Error: Invalid address for DNS server. Try again.")
-        sys.exit(1)
+    while True:
+        try:
+            with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
+            address) as url:
+                data = json.loads(url.read().decode())
+                break
+        except json.decoder.JSONDecodeError:
+            print('Server unresponsive, reattempting connection...')
+            time.sleep(1)
+            continue
+        except urllib.error.URLError:
+            print("Error: Invalid address for DNS server. Try again.")
+            sys.exit(1)
 
     #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(data['domains_over_time'].keys(), reverse=True):
@@ -109,8 +116,10 @@ def main():
                         address of DNS server, defaults to localhost")
     args = parser.parse_args()
     
-    domain_info_hourly = dns_request(args.address)
-    generate_chart(domain_info_hourly, args.color)
+    while True:
+        domain_info_hourly = dns_request(args.address)
+        generate_chart(domain_info_hourly, args.color)
+        time.sleep(30)
 
 if __name__ == '__main__':
     main()

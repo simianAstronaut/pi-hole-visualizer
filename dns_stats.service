@@ -1,0 +1,10 @@
+[Unit]
+Description=Pi-hole Visualizer Service
+After=pihole-FTL.service 
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/pi-hole-visualizer/dns_stats.py -c ads
+
+[Install]
+WantedBy=multi-user.target
