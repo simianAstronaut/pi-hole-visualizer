@@ -10,9 +10,9 @@ Column height represents the relative level of traffic generated for a specific 
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`  
 
 ### Usage
-Usage: dns_stats.py [-h] [-c {traffic, ads}] [-a ADDRESS]  
+**dns_stats.py [-h] [-c {traffic, ads}] [-a ADDRESS]**  
 
-Options:  
+#### Options  
 `-h, --help`  
 Show this help message and exit  
 
