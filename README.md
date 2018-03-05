@@ -14,7 +14,7 @@ Usage: dns_stats.py [-h] [-c {traffic, ads}] [-a ADDRESS]
 
 Options:  
 &nbsp;&nbsp;-h, --help&nbsp; show this help message and exit  
-&nbsp;&nbsp;-c {traffic, ads}, --color {traffic, ads}&nbsp; specify 'traffic' to color code based on level of network traffic, or 'ads' to color code based on percentage of ads blocked  
+&nbsp;&nbsp;-c {traffic, ads, alternate}, --color {traffic, ads, alternate}&nbsp; specify 'traffic' to color code based on level of network traffic, 'ads' to color code based on percentage of ads blocked, or 'alternate' to switch between both  
 &nbsp;&nbsp;-a ADDRESS, --address ADDRESS&nbsp; specify address of dns server, defaults to localhost
 
  ### To Install As a System Service  

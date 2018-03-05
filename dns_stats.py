@@ -109,16 +109,23 @@ def generate_chart(data, color):
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
                                      on the sense-hat RGB display")
-    parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads"], \
-                        help="specify 'traffic' to display level of network traffic or 'ads' to \
-                        display percentage of ads blocked")
+    parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads", "alternate"], \
+                        help="specify 'traffic' to display level of network traffic, 'ads' to \
+                        display percentage of ads blocked, or 'alternate' to switch between both")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
     args = parser.parse_args()
     
+    if args.color == 'alternate':
+        color = 'traffic'
+    else:
+        color = args.color
+    
     while True:
         domain_info_hourly = dns_request(args.address)
-        generate_chart(domain_info_hourly, args.color)
+        generate_chart(domain_info_hourly, color)
+        if args.color == 'alternate':
+            color = 'ads' if color == 'traffic' else 'traffic'
         time.sleep(30)
 
 if __name__ == '__main__':
