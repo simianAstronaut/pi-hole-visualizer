@@ -10,12 +10,17 @@ Column height represents the relative level of traffic generated for a specific 
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`  
 
 ### Usage
-Usage: dns_stats.py [-h] [-c {traffic, ads}] [-a ADDRESS]  
+**dns_stats.py [-h] [-c {traffic, ads, alternate}] [-a ADDRESS]**  
 
-Options:  
-&nbsp;&nbsp;-h, --help&nbsp; show this help message and exit  
-&nbsp;&nbsp;-c {traffic, ads, alternate}, --color {traffic, ads, alternate}&nbsp; specify 'traffic' to color code based on level of network traffic, 'ads' to color code based on percentage of ads blocked, or 'alternate' to switch between both  
-&nbsp;&nbsp;-a ADDRESS, --address ADDRESS&nbsp; specify address of dns server, defaults to localhost
+#### Options  
+`-h, --help`  
+Show this help message and exit  
+
+`-c {traffic, ads, alternate}, --color {traffic, ads, alternate}`  
+Specify 'traffic' to color code based on level of network traffic, 'ads' to color code based on percentage of ads blocked, or 'alternate' to switch between both  
+
+`-a ADDRESS, --address ADDRESS`  
+Specify address of dns server, defaults to localhost
 
  ### To Install As a System Service  
  1. Make the script and unit file executable:  
@@ -30,7 +35,7 @@ Options:
  4. Enable the service to run at startup:  
  `sudo systemctl enable dns_stats`  
  
- 5. Reboot.  
+ 5. Reboot:  
  `sudo reboot`  
  
  6. To check the status of the service:  
