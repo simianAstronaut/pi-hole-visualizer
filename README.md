@@ -3,7 +3,7 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 
 Column height represents the relative level of traffic generated for a specific hourly interval in the previous 24-hour timeframe. Color is used to represent either the aforementioned traffic level or the relative percentage of ads blocked. Pi-hole visualizer can also alternate between the color coding systems at regular intervals. The program is either manually run from the command line or enabled as a systemd service to run automatically at boot.  
 
-![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense-hat_2.jpg)
+![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)
 
 ### Requirements
 * To install Pi-hole, run `curl -sSL https://install.pi-hole.net | bash`
