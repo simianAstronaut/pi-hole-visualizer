@@ -123,10 +123,14 @@ def main():
     
     while True:
         domain_info_hourly = dns_request(args.address)
-        generate_chart(domain_info_hourly, color)
         if args.color == 'alternate':
-            color = 'ads' if color == 'traffic' else 'traffic'
-        time.sleep(30)
+            for i in range(0, 15):
+                color = 'ads' if color == 'traffic' else 'traffic'
+                generate_chart(domain_info_hourly, color)
+                time.sleep(2)
+        else:
+            generate_chart(domain_info_hourly, color)
+            time.sleep(30)
 
 if __name__ == '__main__':
     main()
