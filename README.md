@@ -10,7 +10,7 @@ Column height represents the relative level of traffic generated for a specific 
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`  
 
 ### Usage
-**`dns_stats.py [-h] [-c {traffic, ads, alternate}] [-a ADDRESS]`**  
+**`dns_stats.py [-h] [-c {traffic, ads, alternate}] [-r] [-a ADDRESS]`**  
 
 #### Options  
 `-h, --help`  
@@ -18,6 +18,9 @@ Show this help message and exit
 
 `-c {traffic, ads, alternate}, --color {traffic, ads, alternate}`  
 Specify 'traffic' to color code based on level of network traffic, 'ads' to color code based on percentage of ads blocked, or 'alternate' to switch between both  
+
+`-r, --ripple`  
+Generates a ripple effect when producing the chart  
 
 `-a ADDRESS, --address ADDRESS`  
 Specify address of dns server, defaults to localhost
