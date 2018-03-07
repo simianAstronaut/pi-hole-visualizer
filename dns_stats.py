@@ -63,7 +63,7 @@ def color_dict(level):
         8 : (255, 0, 0),
     }[level]
 
-def generate_chart(data, color):
+def generate_chart(data, color, ripple):
     info_chart = []
     domain_min = data[0][0]
     domain_max = data[0][0]
@@ -101,10 +101,16 @@ def generate_chart(data, color):
                 #if color not set, default to red for all values
                 if color == 'traffic':
                     sense.set_pixel(row, col, color_dict(info_chart[col][0]))
+                    if ripple:
+                        time.sleep(0.01)
                 elif color == 'ads':
                     sense.set_pixel(row, col, color_dict(info_chart[col][1]))
+                    if ripple:
+                        time.sleep(0.01)
                 else:
                     sense.set_pixel(row, col, (255, 0, 0))
+                    if ripple:
+                        time.sleep(0.01)
 
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
@@ -112,6 +118,8 @@ def main():
     parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads", "alternate"], \
                         help="specify 'traffic' to display level of network traffic, 'ads' to \
                         display percentage of ads blocked, or 'alternate' to switch between both")
+    parser.add_argument('-r', '--ripple', action="store_true", help="this option generates a \
+                        ripple effect when producing the chart")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
     args = parser.parse_args()
@@ -126,10 +134,10 @@ def main():
         if args.color == 'alternate':
             for i in range(0, 15):
                 color = 'ads' if color == 'traffic' else 'traffic'
-                generate_chart(domain_info_hourly, color)
+                generate_chart(domain_info_hourly, color, args.ripple)
                 time.sleep(2)
         else:
-            generate_chart(domain_info_hourly, color)
+            generate_chart(domain_info_hourly, color, args.ripple)
             time.sleep(30)
 
 if __name__ == '__main__':
