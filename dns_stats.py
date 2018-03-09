@@ -8,10 +8,10 @@ By Sam Lindley, 2/21/2018
 import argparse
 import json
 import logging
-from sense_hat import SenseHat
 import sys
 import time
 import urllib.request
+from sense_hat import SenseHat
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -28,7 +28,7 @@ def dns_request(address):
     ads = 0
     attempts = 0
 
-    #retrieve and decode json data from pi-hole ftl daemon
+    #retrieve and decode json data from server
     while True:
         try:
             if attempts == 0:
@@ -109,7 +109,7 @@ def generate_chart(data, color, ripple):
         elif hour[1] < ad_min:
             ad_min = hour[1]
 
-    domain_interval = (domain_max - domain_min) / 8 
+    domain_interval = (domain_max - domain_min) / 8
     ad_interval = (ad_max - ad_min) / 8
 
     #append scaled values to new list
@@ -150,12 +150,12 @@ def main():
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
     args = parser.parse_args()
-    
+
     if args.color == 'alternate':
         color = 'traffic'
     else:
         color = args.color
-    
+
     while True:
         domain_info_hourly = dns_request(args.address)
         if args.color == 'alternate':
