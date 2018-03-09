@@ -7,29 +7,46 @@ By Sam Lindley, 2/21/2018
 
 import argparse
 import json
+import logging
 from sense_hat import SenseHat
 import sys
 import time
 import urllib.request
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+handler = logging.FileHandler('/var/log/pihole-visualizer.log')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def dns_request(address):
     domain_info_hourly = []
     key_count = 0
     domains = 0
     ads = 0
+    attempts = 0
 
     #retrieve and decode json data from pi-hole ftl daemon
     while True:
         try:
+            if attempts > 0:
+                logger.info('Reattempting to establish connection with server: Attempt %d', (attempts + 1))
             with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
             address) as url:
+                attempts += 1
                 data = json.loads(url.read().decode())
                 break
         except json.decoder.JSONDecodeError:
-            print('Server unresponsive, reattempting connection...')
-            time.sleep(1)
-            continue
+            if attempts < 150:
+                time.sleep(2)
+                continue
+            else:
+                logger.error('Exceeded max attempts to connect with server.')
+                sys.exit(1)
         except urllib.error.URLError:
+            logger.error('Invalid address for DNS server')
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 

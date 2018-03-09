@@ -1,6 +1,6 @@
 [Unit]
 Description=Pi-hole Visualizer Service
-After=pihole-FTL.service 
+After=pihole-FTL.service
 
 [Service]
 Type=idle
