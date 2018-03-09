@@ -31,35 +31,45 @@ def dns_request(address):
     #retrieve and decode json data from pi-hole ftl daemon
     while True:
         try:
-            if attempts > 0:
-                logger.info('Reattempting to establish connection with server: Attempt %d', (attempts + 1))
+            if attempts == 0:
+                logger.info('Initiating connection with server.')
+                print('Initiating connection with server.')
             with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
             address) as url:
                 attempts += 1
                 data = json.loads(url.read().decode())
                 break
         except json.decoder.JSONDecodeError:
-            if attempts < 150:
-                time.sleep(2)
+            if attempts < 300:
+                time.sleep(1)
                 continue
             else:
                 logger.error('Exceeded max attempts to connect with server.')
+                print('Error: Exceeded max attempts to connect with server.')
                 sys.exit(1)
         except urllib.error.URLError:
-            logger.error('Invalid address for DNS server')
+            logger.error('Invalid address for DNS server.')
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 
     #sort and reverse data so that latest time intervals appear first in list
-    for key in sorted(data['domains_over_time'].keys(), reverse=True):
-        #aggregate data into hourly intervals
-        if key_count > 0 and key_count % 6 == 0:
-            domain_info_hourly.append([domains, (ads / domains) * 100 if domains > 0 else 0])
-            domains = 0
-            ads = 0
-        domains += data['domains_over_time'][key]
-        ads += data['ads_over_time'][key]
-        key_count += 1
+    try:
+        for key in sorted(data['domains_over_time'].keys(), reverse=True):
+            #aggregate data into hourly intervals
+            if key_count > 0 and key_count % 6 == 0:
+                domain_info_hourly.append([domains, (ads / domains) * 100 if domains > 0 else 0])
+                domains = 0
+                ads = 0
+            domains += data['domains_over_time'][key]
+            ads += data['ads_over_time'][key]
+            key_count += 1
+    except KeyError:
+        logger.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
+        print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
+        sys.exit(1)
+
+    logger.info('Successful connection with server.')
+    print('Successful connection with server')
 
     #extract a slice of the previous 24 hours
     domain_info_hourly = domain_info_hourly[:24]
