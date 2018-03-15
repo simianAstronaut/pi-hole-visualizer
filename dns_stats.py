@@ -52,18 +52,7 @@ def dns_request(address):
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 
-    #sort and reverse data so that latest time intervals appear first in list
-    try:
-        for key in sorted(data['domains_over_time'].keys(), reverse=True):
-            #aggregate data into hourly intervals
-            if key_count > 0 and key_count % 6 == 0:
-                domain_info_hourly.append([domains, (ads / domains) * 100 if domains > 0 else 0])
-                domains = 0
-                ads = 0
-            domains += data['domains_over_time'][key]
-            ads += data['ads_over_time'][key]
-            key_count += 1
-    except KeyError:
+    if 'domains_over_time' not in data or 'ads_over_time' not in data:
         logger.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
         print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
         sys.exit(1)
@@ -71,6 +60,17 @@ def dns_request(address):
     logger.info('Successful connection with server.')
     print('Successful connection with server')
 
+    #sort and reverse data so that latest time intervals appear first in list
+    for key in sorted(data['domains_over_time'].keys(), reverse=True):
+        #aggregate data into hourly intervals
+        if key_count > 0 and key_count % 6 == 0:
+            domain_info_hourly.append([domains, (ads / domains) * 100 if domains > 0 else 0])
+            domains = 0
+            ads = 0
+        domains += data['domains_over_time'][key]
+        ads += data['ads_over_time'][key]
+        key_count += 1
+    
     #extract a slice of the previous 24 hours
     domain_info_hourly = domain_info_hourly[:24]
 
