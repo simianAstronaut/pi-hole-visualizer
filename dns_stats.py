@@ -90,7 +90,7 @@ def color_dict(level):
         8 : (255, 0, 0),
     }[level]
 
-def generate_chart(data, color, ripple):
+def generate_chart(data, color, ripple, orientation, lowlight):
     info_chart = []
     domain_min = data[0][0]
     domain_max = data[0][0]
@@ -121,6 +121,13 @@ def generate_chart(data, color, ripple):
     sense = SenseHat()
     sense.clear()
 
+    sense.set_rotation(orientation)
+
+    if lowlight:
+        sense.low_light = True
+    else:
+        sense.low_light = False
+
     #set pixel values on rgb display
     for col in range(0, 8):
         if info_chart[col][0] > 0:
@@ -149,6 +156,10 @@ def main():
                         ripple effect when producing the chart")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
+    parser.add_argument('-o', '--orientation', action="store", choices=[0, 90, 180, 270], \
+                        type=int, default='0', help="rotate graph to match orientation of RPi")
+    parser.add_argument('-ll', '--lowlight', action="store_true", help="set LED matrix to \
+                        light mode for use in dark environments")
     args = parser.parse_args()
 
     if args.color == 'alternate':
@@ -161,10 +172,10 @@ def main():
         if args.color == 'alternate':
             for i in range(0, 15):
                 color = 'ads' if color == 'traffic' else 'traffic'
-                generate_chart(domain_info_hourly, color, args.ripple)
+                generate_chart(domain_info_hourly, color, args.ripple, args.orientation, args.lowlight)
                 time.sleep(2)
         else:
-            generate_chart(domain_info_hourly, color, args.ripple)
+            generate_chart(domain_info_hourly, color, args.ripple, args.orientation, args.lowlight)
             time.sleep(30)
 
 if __name__ == '__main__':

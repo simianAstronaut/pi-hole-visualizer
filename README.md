@@ -25,6 +25,12 @@ Generates a ripple effect when producing the chart
 `-a ADDRESS, --address ADDRESS`  
 Specify address of dns server, defaults to localhost
 
+`-o {0, 90, 180, 270}, --orientation {0, 90, 180, 270}`  
+Specify orientation of display so that RPi may be installed in non-default orientation
+
+`-ll, --lowlight`  
+Lower LED matrix brightness for use in low light environments.
+
  ### To Install As a System Service  
  1. Make the script and unit file executable:  
  `sudo chmod +x dns_stats.py`  
