@@ -58,7 +58,7 @@ def dns_request(address):
         sys.exit(1)
 
     logger.info('Successful connection with server.')
-    print('Successful connection with server')
+    print('Successful connection with server.')
 
     #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(data['domains_over_time'].keys(), reverse=True):
@@ -134,11 +134,11 @@ def generate_chart(data, color, ripple, orientation, lowlight):
             for col in range(0, info_chart[row][0]):
                 #if color not set, default to red for all values
                 if color == 'traffic':
-                    sense.set_pixel(row, 7 - col, color_dict(info_chart[col][0]))
+                    sense.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
                     if ripple:
                         time.sleep(0.01)
                 elif color == 'ads':
-                    sense.set_pixel(row, 7 - col, color_dict(info_chart[col][1]))
+                    sense.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
                     if ripple:
                         time.sleep(0.01)
                 else:
