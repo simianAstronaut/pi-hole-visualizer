@@ -163,7 +163,7 @@ def generate_chart(clean_data, color, ripple, orientation, lowlight):
                     sense.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
                     if ripple:
                         time.sleep(0.01)
-                else:
+                elif color == 'basic':
                     sense.set_pixel(row, 7 - col, (255, 0, 0))
                     if ripple:
                         time.sleep(0.01)
@@ -174,9 +174,10 @@ def main():
 
     parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120], \
                         type=int, default='60', help="specify interval time in minutes")
-    parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads", "alternate"], \
-                        help="specify 'traffic' to display level of network traffic, 'ads' to \
-                        display percentage of ads blocked, or 'alternate' to switch between both")
+    parser.add_argument('-c', '--color', action="store", choices=['basic', 'traffic', 'ads', 'alternate'], \
+                        default='basic', help="specify 'basic' to generate the default red chart, 'traffic' to \
+                        represent the level of network traffic, 'ads' to represent the percentage \
+                        of ads blocked, or 'alternate' to switch between traffic level and ad block percentage")
     parser.add_argument('-r', '--ripple', action="store_true", help="this option generates a \
                         ripple effect when producing the chart")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
