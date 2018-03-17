@@ -23,7 +23,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-#color code hourly interval
+#color code interval
 def color_dict(level):
     return {
         0 : (0, 0, 255),
@@ -71,7 +71,7 @@ def api_request(address):
 
     logger.info('Successful connection with server.')
     print('Successful connection with server.')
-    
+
     return raw_data
 
 def organize_data(raw_data, interval):
@@ -79,7 +79,7 @@ def organize_data(raw_data, interval):
     key_count = 0
     domains = 0
     ads = 0
-    
+
     #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(raw_data['domains_over_time'].keys(), reverse=True):
         if interval == 10:
@@ -105,7 +105,7 @@ def organize_data(raw_data, interval):
             domains += raw_data['domains_over_time'][key]
             ads += raw_data['ads_over_time'][key]
             key_count += 1
-    
+
     #extract a slice of the previous 24 hours
     if interval == 10:
         clean_data = clean_data[:144]
@@ -118,42 +118,37 @@ def organize_data(raw_data, interval):
 
     return clean_data
 
-def generate_chart(data, color, ripple, orientation, lowlight):
+def generate_chart(clean_data, color, ripple, orientation, lowlight):
     info_chart = []
-    domain_min = data[0][0]
-    domain_max = data[0][0]
-    ad_min = data[0][1]
-    ad_max = data[0][1]
+    domain_min = clean_data[0][0]
+    domain_max = clean_data[0][0]
+    ad_min = clean_data[0][1]
+    ad_max = clean_data[0][1]
 
     #calculate minimum, maximum, and interval values to scale graph appropriately
-    for hour in data:
-        if hour[0] > domain_max:
-            domain_max = hour[0]
-        elif hour[0] < domain_min:
-            domain_min = hour[0]
+    for i in clean_data:
+        if i[0] > domain_max:
+            domain_max = i[0]
+        elif i[0] < domain_min:
+            domain_min = i[0]
 
-        if hour[1] > ad_max:
-            ad_max = hour[1]
-        elif hour[1] < ad_min:
-            ad_min = hour[1]
+        if i[1] > ad_max:
+            ad_max = i[1]
+        elif i[1] < ad_min:
+            ad_min = i[1]
 
     domain_interval = (domain_max - domain_min) / 8
     ad_interval = (ad_max - ad_min) / 8
 
     #append scaled values to new list
-    for hour in data:
-        info_chart.append([int((hour[0] - domain_min) / domain_interval) if domain_interval > 0 \
-                           else 0, int((hour[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
+    for i in clean_data:
+        info_chart.append([int((i[0] - domain_min) / domain_interval) if domain_interval > 0 \
+                           else 0, int((i[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
     info_chart = list(reversed(info_chart[:8]))
 
     sense.clear()
-
     sense.set_rotation(orientation)
-
-    if lowlight:
-        sense.low_light = True
-    else:
-        sense.low_light = False
+    sense.low_light = lowlight
 
     #set pixel values on rgb display
     for row in range(0, 8):
@@ -176,8 +171,9 @@ def generate_chart(data, color, ripple, orientation, lowlight):
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
                                      on the sense-hat RGB display")
+
     parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120], \
-                        type=int, default='60', help="specify interval time in minutes")                                 
+                        type=int, default='60', help="specify interval time in minutes")
     parser.add_argument('-c', '--color', action="store", choices=["traffic", "ads", "alternate"], \
                         help="specify 'traffic' to display level of network traffic, 'ads' to \
                         display percentage of ads blocked, or 'alternate' to switch between both")
@@ -189,6 +185,7 @@ def main():
                         type=int, default='0', help="rotate graph to match orientation of RPi")
     parser.add_argument('-ll', '--lowlight', action="store_true", help="set LED matrix to \
                         light mode for use in dark environments")
+
     args = parser.parse_args()
 
     if args.color == 'alternate':
@@ -199,7 +196,7 @@ def main():
     while True:
         raw_data = api_request(args.address)
         clean_data = organize_data(raw_data, args.interval)
-        
+
         if args.color == 'alternate':
             for i in range(0, 15):
                 color = 'ads' if color == 'traffic' else 'traffic'
