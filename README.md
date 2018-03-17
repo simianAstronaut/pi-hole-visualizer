@@ -19,7 +19,7 @@ Show this help message and exit.
 `-i {10, 30, 60, 120}, --interval {10, 30, 60, 120}`  
 Specify interval time in minutes. Defaults to one hour.
 
-`-c {traffic, ads, alternate}, --color {traffic, ads, alternate}`  
+`-c {basic, traffic, ads, alternate}, --color {basic, traffic, ads, alternate}`  
 Specify 'basic' to generate the default red chart, 'traffic' to represent the level of network traffic, 'ads' to represent the percentage of ads blocked, or 'alternate' to switch between traffic level and ad block percentage.  
 
 `-r, --ripple`  
