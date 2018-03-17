@@ -80,7 +80,7 @@ def organize_data(raw_data, interval):
     domains = 0
     ads = 0
     
-	#sort and reverse data so that latest time intervals appear first in list
+    #sort and reverse data so that latest time intervals appear first in list
     for key in sorted(raw_data['domains_over_time'].keys(), reverse=True):
         if interval == 10:
             domains = raw_data['domains_over_time'][key]
