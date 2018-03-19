@@ -50,6 +50,19 @@ def joystick_up(color_mode):
 
     return color_mode
 
+def joystick_right(interval):
+    interval_options = (10, 30, 60, 120)
+    interval_index = interval_options.index(interval)
+
+    if interval_index == 3:
+        interval_index = 0
+    else:
+        interval_index += 1
+
+    interval = interval_options[interval_index]
+
+    return interval
+
 def api_request(address):
     attempts = 0
 
@@ -218,30 +231,42 @@ def main():
             for i in range(0, 5):
                 color = 'ads' if color == 'traffic' else 'traffic'
                 generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
+
                 for i in range(0, 2):
                     events = sense.stick.get_events()
                     if events:
+                        joystick_event = True
                         direction = events[-1].direction
                         if direction == 'up':
-                            joystick_event = True
                             color_mode = joystick_up(color_mode)
                             print("Color mode switched to '%s'" % color_mode.capitalize())
                             break
+                        elif direction == 'right':
+                            args.interval = joystick_right(args.interval)
+                            print("Time interval switched to %d minutes" % args.interval)
+                            break
+
                     time.sleep(1)
+
                 if joystick_event:
                     break
         else:
             color = color_mode
             generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
+
             for i in range(0, 10):
                 events = sense.stick.get_events()
                 if events:
                     direction = events[-1].direction
                     if direction == 'up':
-                        joystick_event = True
                         color_mode = joystick_up(color_mode)
                         print("Color mode switched to '%s'" % color_mode.capitalize())
                         break
+                    elif direction == 'right':
+                        args.interval = joystick_right(args.interval)
+                        print("Time interval switched to %d minutes" % args.interval)
+                        break
+
                 time.sleep(1)
 
 if __name__ == '__main__':
