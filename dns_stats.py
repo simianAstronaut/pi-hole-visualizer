@@ -63,6 +63,35 @@ def joystick_right(interval):
 
     return interval
 
+def joystick_down(lowlight):
+    if lowlight:
+        lowlight = False
+    else:
+        lowlight = True
+
+    return lowlight
+
+def joystick_left(orientation):
+    orientation_options = (0, 90, 180, 270)
+    orientation_index = orientation_options.index(orientation)
+
+    if orientation_index == 3:
+        orientation_index = 0
+    else:
+        orientation_index += 1
+
+    orientation = orientation_options[orientation_index]
+
+    return orientation
+
+def joystick_middle(ripple):
+    if ripple:
+        ripple = False
+    else:
+        ripple = True
+
+    return ripple
+
 def api_request(address):
     attempts = 0
 
@@ -184,15 +213,15 @@ def generate_chart(clean_data, color, ripple, orientation, lowlight):
                 if color == 'traffic':
                     sense.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
                     if ripple:
-                        time.sleep(0.01)
+                        time.sleep(0.025)
                 elif color == 'ads':
                     sense.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
                     if ripple:
-                        time.sleep(0.01)
+                        time.sleep(0.025)
                 elif color == 'basic':
                     sense.set_pixel(row, 7 - col, (255, 0, 0))
                     if ripple:
-                        time.sleep(0.01)
+                        time.sleep(0.025)
 
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
@@ -228,7 +257,7 @@ def main():
         clean_data = organize_data(raw_data, args.interval)
 
         if color_mode == 'alternate':
-            for i in range(0, 5):
+            for i in range(0, 15):
                 color = 'ads' if color == 'traffic' else 'traffic'
                 generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
 
@@ -245,6 +274,20 @@ def main():
                             args.interval = joystick_right(args.interval)
                             print("Time interval switched to %d minutes" % args.interval)
                             break
+                        elif direction == 'down':
+                            args.lowlight = joystick_down(args.lowlight)
+                            print("Low-light mode", "enabled" if args.lowlight == True \
+                                   else "disabled")
+                            break
+                        elif direction == 'left':
+                            args.orientation = joystick_left(args.orientation)
+                            print("Orientation switched to %d degrees" % args.orientation)
+                            break
+                        elif direction == 'middle':
+                            args.ripple = joystick_middle(args.ripple)
+                            print("Ripple mode", "enabled" if args.ripple == True \
+                                   else "disabled")
+                            break
 
                     time.sleep(1)
 
@@ -254,7 +297,7 @@ def main():
             color = color_mode
             generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
 
-            for i in range(0, 10):
+            for i in range(0, 30):
                 events = sense.stick.get_events()
                 if events:
                     direction = events[-1].direction
@@ -265,6 +308,20 @@ def main():
                     elif direction == 'right':
                         args.interval = joystick_right(args.interval)
                         print("Time interval switched to %d minutes" % args.interval)
+                        break
+                    elif direction == 'down':
+                        args.lowlight = joystick_down(args.lowlight)
+                        print("Low-light mode", "enabled" if args.lowlight == True \
+                               else "disabled")
+                        break
+                    elif direction == 'left':
+                        args.orientation = joystick_left(args.orientation)
+                        print("Orientation switched to %d degrees" % args.orientation)
+                        break
+                    elif direction == 'middle':
+                        args.ripple = joystick_middle(args.ripple)
+                        print("Ripple mode", "enabled" if args.ripple == True \
+                               else "disabled")
                         break
 
                 time.sleep(1)
