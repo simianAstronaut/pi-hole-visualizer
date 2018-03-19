@@ -37,6 +37,19 @@ def color_dict(level):
         8 : (255, 0, 0),
     }[level]
 
+def joystick_up(color_mode):
+    color_options = ('basic', 'traffic', 'ads', 'alternate')
+    color_index = color_options.index(color_mode)
+
+    if color_index == 3:
+        color_index = 0
+    else:
+        color_index += 1
+
+    color_mode = color_options[color_index]
+
+    return color_mode
+
 def api_request(address):
     attempts = 0
 
@@ -188,24 +201,48 @@ def main():
                         light mode for use in dark environments")
 
     args = parser.parse_args()
+    color_mode = args.color
 
-    if args.color == 'alternate':
+    if color_mode == 'alternate':
         color = 'traffic'
     else:
-        color = args.color
+        color = color_mode
 
     while True:
+        joystick_event = False
+
         raw_data = api_request(args.address)
         clean_data = organize_data(raw_data, args.interval)
 
-        if args.color == 'alternate':
-            for i in range(0, 15):
+        if color_mode == 'alternate':
+            for i in range(0, 5):
                 color = 'ads' if color == 'traffic' else 'traffic'
                 generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
-                time.sleep(2)
+                for i in range(0, 2):
+                    events = sense.stick.get_events()
+                    if events:
+                        direction = events[-1].direction
+                        if direction == 'up':
+                            joystick_event = True
+                            color_mode = joystick_up(color_mode)
+                            print("Color mode switched to '%s'" % color_mode.capitalize())
+                            break
+                    time.sleep(1)
+                if joystick_event:
+                    break
         else:
+            color = color_mode
             generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
-            time.sleep(30)
+            for i in range(0, 10):
+                events = sense.stick.get_events()
+                if events:
+                    direction = events[-1].direction
+                    if direction == 'up':
+                        joystick_event = True
+                        color_mode = joystick_up(color_mode)
+                        print("Color mode switched to '%s'" % color_mode.capitalize())
+                        break
+                time.sleep(1)
 
 if __name__ == '__main__':
     main()
