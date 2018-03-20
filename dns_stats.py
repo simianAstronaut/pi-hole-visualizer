@@ -8,6 +8,7 @@ By Sam Lindley, 2/21/2018
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 import urllib.request
@@ -15,13 +16,14 @@ from sense_hat import SenseHat
 
 sense = SenseHat()
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+if os.geteuid() == 0:
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
 
-handler = logging.FileHandler('/var/log/pihole-visualizer.log')
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+    handler = logging.FileHandler('/var/log/pihole-visualizer.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 #color code interval
 def color_dict(level):
@@ -99,7 +101,8 @@ def api_request(address):
     while True:
         try:
             if attempts == 0:
-                logger.info('Initiating connection with server.')
+                if os.geteuid() == 0:
+                    logger.info('Initiating connection with server.')
                 print('Initiating connection with server.')
             with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
             address) as url:
@@ -111,20 +114,24 @@ def api_request(address):
                 time.sleep(1)
                 continue
             else:
-                logger.error('Exceeded max attempts to connect with server.')
+                if os.geteuid() == 0:
+                    logger.error('Exceeded max attempts to connect with server.')
                 print('Error: Exceeded max attempts to connect with server.')
                 sys.exit(1)
         except urllib.error.URLError:
-            logger.error('Invalid address for DNS server.')
+            if os.geteuid() == 0:
+                logger.error('Invalid address for DNS server.')
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 
     if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data:
-        logger.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
+        if os.geteuid() == 0:
+            logger.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
         print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
         sys.exit(1)
 
-    logger.info('Successful connection with server.')
+    if os.geteuid() == 0:
+        logger.info('Successful connection with server.')
     print('Successful connection with server.')
 
     return raw_data
