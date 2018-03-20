@@ -229,10 +229,11 @@ def main():
 
     parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120], \
                         type=int, default='60', help="specify interval time in minutes")
-    parser.add_argument('-c', '--color', action="store", choices=['basic', 'traffic', 'ads', 'alternate'], \
-                        default='basic', help="specify 'basic' to generate the default red chart, 'traffic' to \
-                        represent the level of network traffic, 'ads' to represent the percentage \
-                        of ads blocked, or 'alternate' to switch between traffic level and ad block percentage")
+    parser.add_argument('-c', '--color', action="store", choices=['basic', 'traffic', 'ads', \
+                        'alternate'], default='basic', help="specify 'basic' to generate the \
+                        default red chart, 'traffic' to represent the level of network traffic, \
+                        'ads' to represent the percentage of ads blocked, or 'alternate' to \
+                        switch between traffic level and ad block percentage")
     parser.add_argument('-r', '--ripple', action="store_true", help="this option generates a \
                         ripple effect when producing the chart")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
@@ -276,8 +277,7 @@ def main():
                             break
                         elif direction == 'down':
                             args.lowlight = joystick_down(args.lowlight)
-                            print("Low-light mode", "enabled" if args.lowlight == True \
-                                   else "disabled")
+                            print("Low-light mode", "enabled" if args.lowlight else "disabled")
                             break
                         elif direction == 'left':
                             args.orientation = joystick_left(args.orientation)
@@ -285,8 +285,7 @@ def main():
                             break
                         elif direction == 'middle':
                             args.ripple = joystick_middle(args.ripple)
-                            print("Ripple mode", "enabled" if args.ripple == True \
-                                   else "disabled")
+                            print("Ripple mode", "enabled" if args.ripple else "disabled")
                             break
 
                     time.sleep(1)
@@ -311,8 +310,7 @@ def main():
                         break
                     elif direction == 'down':
                         args.lowlight = joystick_down(args.lowlight)
-                        print("Low-light mode", "enabled" if args.lowlight == True \
-                               else "disabled")
+                        print("Low-light mode", "enabled" if args.lowlight else "disabled")
                         break
                     elif direction == 'left':
                         args.orientation = joystick_left(args.orientation)
@@ -320,8 +318,7 @@ def main():
                         break
                     elif direction == 'middle':
                         args.ripple = joystick_middle(args.ripple)
-                        print("Ripple mode", "enabled" if args.ripple == True \
-                               else "disabled")
+                        print("Ripple mode", "enabled" if args.ripple else "disabled")
                         break
 
                 time.sleep(1)
