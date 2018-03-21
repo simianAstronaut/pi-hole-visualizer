@@ -1,9 +1,15 @@
 # Pi-hole Visualizer  
-Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful and informative way on the Sense-HAT. It depends on the Pi-hole ecosystem and specifically the FTL daemon to retrieve statistics about DNS queries and ads blocked on the local network.  
+Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful and informative way on the Raspberry Pi Sense-HAT. It depends on the Pi-hole ecosystem to retrieve statistics about DNS queries and ads blocked on the local network.    
 
-Column height represents the relative level of traffic generated for a specific time interval in the previous 24-hour timeframe. Color is used to represent either the aforementioned traffic level or the relative percentage of ads blocked. Pi-hole visualizer can also alternate between the color coding systems at regular intervals. If you desire a more 'aesthetic' experience try the ripple option. The program is either manually run from the command line or enabled as a systemd service to run automatically at boot.  
+![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)  
 
-![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)
+### Details  
+- Column height represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 2 hours.  
+
+- Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked. Pi-hole Visualizer can also alternate between the color coding options at regular intervals.  
+
+- Options include a ripple effect when generating the chart, specifying orientation of the display, and low-light mode.  
+- Each option corresponds to a joystick direction that can alter program behavior while running.
 
 ### Requirements
 * To install Pi-hole, run `curl -sSL https://install.pi-hole.net | bash`
