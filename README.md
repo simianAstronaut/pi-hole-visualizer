@@ -10,7 +10,9 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 
 - Additional options include a ripple effect when generating the chart, specifying orientation of the display, and low-light mode.  
 
-- Every option corresponds to a joystick direction that can alter program behavior while running.
+- Each option corresponds to a joystick direction that can alter program behavior while running.  
+
+- Pi-hole Visualizer is either manually run from the command line or enabled as a systemd service to run automatically at boot.  
 
 ### Requirements
 * To install Pi-hole, run `curl -sSL https://install.pi-hole.net | bash`.
@@ -42,19 +44,19 @@ Specify orientation of display so that RPi may be installed in non-default orien
 Lower LED matrix brightness for use in low light environments.  
 
 #### Joystick Controls  
-- **UP**  
+- _UP_  
 Cycle color mode.  
 
-- **RIGHT**  
+- _RIGHT_  
 Cycle interval selection.  
 
-- **DOWN**  
+- _DOWN_  
 Toggle low-light mode.  
 
-- **LEFT**  
+- _LEFT_  
 Cycle display orientation.
 
-- **MIDDLE**  
+- _MIDDLE_  
 Enable ripple effect.  
 
  ### To Install As a System Service  
