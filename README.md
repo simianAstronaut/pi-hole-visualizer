@@ -8,15 +8,16 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 
 - Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked. Pi-hole Visualizer can also alternate between the color coding options at regular intervals.  
 
-- Options include a ripple effect when generating the chart, specifying orientation of the display, and low-light mode.  
-- Each option corresponds to a joystick direction that can alter program behavior while running.
+- Additional options include a ripple effect when generating the chart, specifying orientation of the display, and low-light mode.  
+
+- Every option corresponds to a joystick direction that can alter program behavior while running.
 
 ### Requirements
 * To install Pi-hole, run `curl -sSL https://install.pi-hole.net | bash`
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`  
 
 ### Usage
-**`dns_stats.py [-h] [-i {10, 30, 60, 120}] [-c {basic, traffic, ads, alternate}] [-r] [-a ADDRESS] [-o {0, 90, 180, 270}] [-ll]`**  
+**`dns_stats.py [OPTION]`**  
 
 #### Options  
 `-h, --help`  
