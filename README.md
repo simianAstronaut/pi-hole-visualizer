@@ -1,7 +1,7 @@
 # Pi-hole Visualizer  
 Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful and informative way on the Raspberry Pi Sense-HAT. It depends on the Pi-hole ecosystem to retrieve statistics about DNS queries and ads blocked on the local network.    
 
-![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)  
+![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat_optimized.gif)  
 
 ### Details  
 - Column height represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 2 hours.  
