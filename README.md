@@ -13,11 +13,14 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 - Each option corresponds to a joystick direction that can alter program behavior while running.  
 
 - Pi-hole Visualizer is either manually run from the command line or enabled as a systemd service to run automatically at boot.  
-
+---  
+  
 ### Requirements
 * To install Pi-hole, run `curl -sSL https://install.pi-hole.net | bash`.
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`.  
-
+ 
+---  
+  
 ### Usage
 **`dns_stats.py [OPTION]`**  
 
@@ -58,7 +61,9 @@ Cycle display orientation.
 
 - _MIDDLE_  
 Enable ripple effect.  
-
+ 
+---  
+  
  ### To Install As a System Service  
  1. Make the script and unit file executable:  
  `sudo chmod +x dns_stats.py`  
