@@ -14,30 +14,17 @@ import time
 import urllib.request
 from sense_hat import SenseHat
 
-sense = SenseHat()
+SENSE = SenseHat()
 
 if os.geteuid() == 0:
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    LOGGER = logging.getLogger(__name__)
+    LOGGER.setLevel(logging.INFO)
 
-    handler = logging.FileHandler('/var/log/pihole-visualizer.log')
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    HANDLER = logging.FileHandler('/var/log/pihole-visualizer.log')
+    FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    HANDLER.setFormatter(FORMATTER)
+    LOGGER.addHandler(HANDLER)
 
-#color code interval
-def color_dict(level):
-    return {
-        0 : (0, 0, 255),
-        1 : (0, 128, 255),
-        2 : (0, 255, 255),
-        3 : (255, 128, 0),
-        4 : (0, 255, 0),
-        5 : (128, 255, 0),
-        6 : (255, 255, 0),
-        7 : (255, 128, 0),
-        8 : (255, 0, 0),
-    }[level]
 
 def joystick_up(color_mode):
     color_options = ('basic', 'traffic', 'ads', 'alternate')
@@ -94,6 +81,20 @@ def joystick_middle(ripple):
 
     return ripple
 
+#color code interval
+def color_dict(level):
+    return {
+        0 : (0, 0, 255),
+        1 : (0, 128, 255),
+        2 : (0, 255, 255),
+        3 : (255, 128, 0),
+        4 : (0, 255, 0),
+        5 : (128, 255, 0),
+        6 : (255, 255, 0),
+        7 : (255, 128, 0),
+        8 : (255, 0, 0),
+    }[level]
+
 def api_request(address):
     attempts = 0
 
@@ -102,7 +103,7 @@ def api_request(address):
         try:
             if attempts == 0:
                 if os.geteuid() == 0:
-                    logger.info('Initiating connection with server.')
+                    LOGGER.info('Initiating connection with server.')
                 print('Initiating connection with server.')
             with urllib.request.urlopen("http://%s/admin/api.php?overTimeData10mins" % \
             address) as url:
@@ -115,23 +116,23 @@ def api_request(address):
                 continue
             else:
                 if os.geteuid() == 0:
-                    logger.error('Exceeded max attempts to connect with server.')
+                    LOGGER.error('Exceeded max attempts to connect with server.')
                 print('Error: Exceeded max attempts to connect with server.')
                 sys.exit(1)
         except urllib.error.URLError:
             if os.geteuid() == 0:
-                logger.error('Invalid address for DNS server.')
+                LOGGER.error('Invalid address for DNS server.')
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 
     if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data:
         if os.geteuid() == 0:
-            logger.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
+            LOGGER.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
         print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
         sys.exit(1)
 
     if os.geteuid() == 0:
-        logger.info('Successful connection with server.')
+        LOGGER.info('Successful connection with server.')
     print('Successful connection with server.')
 
     return raw_data
@@ -208,9 +209,9 @@ def generate_chart(clean_data, color, ripple, orientation, lowlight):
                            else 0, int((i[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
     info_chart = list(reversed(info_chart[:8]))
 
-    sense.clear()
-    sense.set_rotation(orientation)
-    sense.low_light = lowlight
+    SENSE.clear()
+    SENSE.set_rotation(orientation)
+    SENSE.low_light = lowlight
 
     #set pixel values on rgb display
     for row in range(0, 8):
@@ -218,21 +219,21 @@ def generate_chart(clean_data, color, ripple, orientation, lowlight):
             for col in range(0, info_chart[row][0]):
                 #if color not set, default to red for all values
                 if color == 'traffic':
-                    sense.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
+                    SENSE.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
                     if ripple:
                         time.sleep(0.025)
                 elif color == 'ads':
-                    sense.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
+                    SENSE.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
                     if ripple:
                         time.sleep(0.025)
                 elif color == 'basic':
-                    sense.set_pixel(row, 7 - col, (255, 0, 0))
+                    SENSE.set_pixel(row, 7 - col, (255, 0, 0))
                     if ripple:
                         time.sleep(0.025)
 
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
-                                     on the sense-hat RGB display")
+                                     on the Sense-HAT RGB display")
 
     parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120], \
                         type=int, default='60', help="specify interval time in minutes")
@@ -270,7 +271,7 @@ def main():
                 generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
 
                 for i in range(0, 2):
-                    events = sense.stick.get_events()
+                    events = SENSE.stick.get_events()
                     if events:
                         joystick_event = True
                         direction = events[-1].direction
@@ -304,7 +305,7 @@ def main():
             generate_chart(clean_data, color, args.ripple, args.orientation, args.lowlight)
 
             for i in range(0, 30):
-                events = sense.stick.get_events()
+                events = SENSE.stick.get_events()
                 if events:
                     direction = events[-1].direction
                     if direction == 'up':
