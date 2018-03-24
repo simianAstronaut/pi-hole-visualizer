@@ -96,12 +96,15 @@ def color_dict(level):
     }[level]
 
 def api_request(address):
+    if not hasattr(api_request, "initial_connection"):
+        api_request.initial_connection = True
+    max_attempts = 300 if api_request.initial_connection else 30 
     attempts = 0
 
     #retrieve and decode json data from server
     while True:
         try:
-            if attempts == 0:
+            if attempts == 0 and api_request.initial_connection:
                 if os.geteuid() == 0:
                     LOGGER.info('Initiating connection with server.')
                 print('Initiating connection with server.')
@@ -111,7 +114,7 @@ def api_request(address):
                 raw_data = json.loads(url.read().decode())
                 break
         except json.decoder.JSONDecodeError:
-            if attempts < 300:
+            if attempts < max_attempts:
                 time.sleep(1)
                 continue
             else:
@@ -131,9 +134,12 @@ def api_request(address):
         print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
         sys.exit(1)
 
-    if os.geteuid() == 0:
-        LOGGER.info('Successful connection with server.')
-    print('Successful connection with server.')
+    if api_request.initial_connection:
+        if os.geteuid() == 0:
+            LOGGER.info('Successful connection with server.')
+        print('Successful connection with server.')
+
+    api_request.initial_connection = False
 
     return raw_data
 
