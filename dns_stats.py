@@ -145,35 +145,33 @@ def api_request(address):
 
 def organize_data(raw_data, interval):
     clean_data = []
-    key_count = 0
     domains = 0
     ads = 0
 
     #sort and reverse data so that latest time intervals appear first in list
-    for key in sorted(raw_data['domains_over_time'].keys(), reverse=True):
+    for counter, key in enumerate(sorted(raw_data['domains_over_time'].keys(), reverse=True)):
         if interval == 10:
             domains = raw_data['domains_over_time'][key]
             ads = raw_data['ads_over_time'][key]
             clean_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
         else:
             if interval == 30:
-                if key_count > 0 and key_count % 3 == 0:
+                if counter > 0 and counter % 3 == 0:
                     clean_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
                     domains = 0
                     ads = 0
             elif interval == 60:
-                if key_count > 0 and key_count % 6 == 0:
+                if counter > 0 and counter % 6 == 0:
                     clean_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
                     domains = 0
                     ads = 0
             elif interval == 120:
-                if key_count > 0 and key_count % 12 == 0:
+                if counter > 0 and counter % 12 == 0:
                     clean_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
                     domains = 0
                     ads = 0
             domains += raw_data['domains_over_time'][key]
             ads += raw_data['ads_over_time'][key]
-            key_count += 1
 
     #extract a slice of the previous 24 hours
     if interval == 10:
