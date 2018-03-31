@@ -81,6 +81,15 @@ def joystick_middle(ripple):
 
     return ripple
 
+def joystick_middle_held():
+    if os.geteuid() == 0:
+        LOGGER.info('Program terminated by user.')
+    print('Program terminated by user.')
+
+    SENSE.clear()
+
+    sys.exit()
+
 #color code interval
 def color_dict(level):
     return {
@@ -98,7 +107,7 @@ def color_dict(level):
 def api_request(address):
     if not hasattr(api_request, "initial_connection"):
         api_request.initial_connection = True
-    max_attempts = 300 if api_request.initial_connection else 30 
+    max_attempts = 300 if api_request.initial_connection else 30
     attempts = 0
 
     #retrieve and decode json data from server
@@ -278,27 +287,31 @@ def main():
                     events = SENSE.stick.get_events()
                     if events:
                         joystick_event = True
-                        direction = events[-1].direction
-                        if direction == 'up':
-                            color_mode = joystick_up(color_mode)
-                            print("Color mode switched to '%s'" % color_mode.capitalize())
-                            break
-                        elif direction == 'right':
-                            args.interval = joystick_right(args.interval)
-                            print("Time interval switched to %d minutes" % args.interval)
-                            break
-                        elif direction == 'down':
-                            args.lowlight = joystick_down(args.lowlight)
-                            print("Low-light mode", "enabled" if args.lowlight else "disabled")
-                            break
-                        elif direction == 'left':
-                            args.orientation = joystick_left(args.orientation)
-                            print("Orientation switched to %d degrees" % args.orientation)
-                            break
-                        elif direction == 'middle':
-                            args.ripple = joystick_middle(args.ripple)
-                            print("Ripple mode", "enabled" if args.ripple else "disabled")
-                            break
+                        last_event = events[-1]
+                        if last_event.action == 'held' and last_event.direction == 'middle':
+                            joystick_middle_held()
+                        else:
+                            if last_event.direction == 'up':
+                                color_mode = joystick_up(color_mode)
+                                print("Color mode switched to '%s'." % color_mode.capitalize())
+                                break
+                            elif last_event.direction == 'right':
+                                args.interval = joystick_right(args.interval)
+                                print("Time interval switched to %d minutes." % args.interval)
+                                break
+                            elif last_event.direction == 'down':
+                                args.lowlight = joystick_down(args.lowlight)
+                                print("Low-light mode", "enabled." if args.lowlight else \
+                                      "disabled.")
+                                break
+                            elif last_event.direction == 'left':
+                                args.orientation = joystick_left(args.orientation)
+                                print("Orientation switched to %d degrees." % args.orientation)
+                                break
+                            elif last_event.direction == 'middle':
+                                args.ripple = joystick_middle(args.ripple)
+                                print("Ripple mode", "enabled." if args.ripple else "disabled.")
+                                break
 
                     time.sleep(1)
 
@@ -311,27 +324,30 @@ def main():
             for i in range(0, 30):
                 events = SENSE.stick.get_events()
                 if events:
-                    direction = events[-1].direction
-                    if direction == 'up':
-                        color_mode = joystick_up(color_mode)
-                        print("Color mode switched to '%s'" % color_mode.capitalize())
-                        break
-                    elif direction == 'right':
-                        args.interval = joystick_right(args.interval)
-                        print("Time interval switched to %d minutes" % args.interval)
-                        break
-                    elif direction == 'down':
-                        args.lowlight = joystick_down(args.lowlight)
-                        print("Low-light mode", "enabled" if args.lowlight else "disabled")
-                        break
-                    elif direction == 'left':
-                        args.orientation = joystick_left(args.orientation)
-                        print("Orientation switched to %d degrees" % args.orientation)
-                        break
-                    elif direction == 'middle':
-                        args.ripple = joystick_middle(args.ripple)
-                        print("Ripple mode", "enabled" if args.ripple else "disabled")
-                        break
+                    last_event = events[-1]
+                    if last_event.action == 'held' and last_event.direction == 'middle':
+                        joystick_middle_held()
+                    else:
+                        if last_event.direction == 'up':
+                            color_mode = joystick_up(color_mode)
+                            print("Color mode switched to '%s'." % color_mode.capitalize())
+                            break
+                        elif last_event.direction == 'right':
+                            args.interval = joystick_right(args.interval)
+                            print("Time interval switched to %d minutes." % args.interval)
+                            break
+                        elif last_event.direction == 'down':
+                            args.lowlight = joystick_down(args.lowlight)
+                            print("Low-light mode", "enabled." if args.lowlight else "disabled.")
+                            break
+                        elif last_event.direction == 'left':
+                            args.orientation = joystick_left(args.orientation)
+                            print("Orientation switched to %d degrees." % args.orientation)
+                            break
+                        elif last_event.direction == 'middle':
+                            args.ripple = joystick_middle(args.ripple)
+                            print("Ripple mode", "enabled." if args.ripple else "disabled.")
+                            break
 
                 time.sleep(1)
 
