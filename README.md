@@ -47,19 +47,19 @@ Specify orientation of display so that RPi may be installed in non-default orien
 Lower LED matrix brightness for use in low light environments.  
 
 #### Joystick Controls  
-- _UP_  
+- _UP - PUSH_  
 Cycle color mode.  
 
-- _RIGHT_  
+- _RIGHT - PUSH_  
 Cycle interval selection.  
 
-- _DOWN_  
+- _DOWN - PUSH_  
 Toggle low-light mode.  
 
-- _LEFT_  
+- _LEFT - PUSH_  
 Cycle display orientation.
 
-- _MIDDLE_  
+- _MIDDLE - PUSH_  
 Enable ripple effect.  
 
 - _MIDDLE - HOLD_  
