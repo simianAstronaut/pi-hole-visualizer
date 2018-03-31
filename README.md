@@ -61,6 +61,9 @@ Cycle display orientation.
 
 - _MIDDLE_  
 Enable ripple effect.  
+
+- _MIDDLE - HOLD_  
+Exit program.  
  
 ---  
   
