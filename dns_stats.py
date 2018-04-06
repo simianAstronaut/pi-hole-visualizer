@@ -10,10 +10,10 @@ from itertools import cycle
 import json
 import logging
 import os
+from sense_hat import SenseHat
 import sys
 import time
 import urllib.request
-from sense_hat import SenseHat
 
 SENSE = SenseHat()
 RIPPLE_SPEED = 0.025
@@ -43,10 +43,10 @@ def joystick_up_pushed(color):
 
 
 def joystick_right_pushed(interval):
-    interval_options = (10, 30, 60, 120)
+    interval_options = (10, 30, 60, 120, 180)
     interval_index = interval_options.index(interval)
 
-    if interval_index == 3:
+    if interval_index == 4:
         interval_index = 0
     else:
         interval_index += 1
@@ -179,6 +179,12 @@ def generate_interval_data(raw_data, interval):
                     interval_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
                     domains = 0
                     ads = 0
+            elif interval == 180:
+                if counter > 0 and counter % 18 == 0:
+                    interval_data.append([domains, (ads / domains) * 100 if domains > 0 else 0])
+                    domains = 0
+                    ads = 0
+
             domains += raw_data['domains_over_time'][key]
             ads += raw_data['ads_over_time'][key]
 
@@ -191,6 +197,8 @@ def generate_interval_data(raw_data, interval):
         interval_data = interval_data[:24]
     elif interval == 120:
         interval_data = interval_data[:12]
+    elif interval == 180:
+        interval_data = interval_data[:8]
 
     return interval_data
 
@@ -331,7 +339,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
                                      on the Sense-HAT RGB display")
 
-    parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120], \
+    parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120, 180], \
                         type=int, default='60', help="specify interval time in minutes")
     parser.add_argument('-c', '--color', action="store", choices=['basic', 'traffic', 'ads'], \
                         default='basic', help="specify 'basic' to generate the default red \
