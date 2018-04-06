@@ -30,7 +30,7 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 `-h, --help`  
 Show this help message and exit.  
 
-`-i {10, 30, 60, 120}, --interval {10, 30, 60, 120}`  
+`-i {10, 30, 60, 120, 180}, --interval {10, 30, 60, 120, 180}`  
 Specify interval time in minutes. Defaults to one hour.
 
 `-c {basic, traffic, ads}, --color {basic, traffic, ads}`  
