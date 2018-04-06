@@ -4,11 +4,13 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 ![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)  
 
 ### Details  
-- Column height represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 2 hours.  
+- Pi-hole Visualizer alternates between displaying a bar chart of DNS traffic and a spiral graph representing overall percentage of ads blocked.  
 
-- Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked. Pi-hole Visualizer can also alternate between the color coding options at regular intervals.  
+- Column height in the bar chart represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 2 hours. Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked.  
 
-- Additional options include a ripple effect when generating the chart, specifying orientation of the display, and low-light mode.  
+- In the spiral graph, the overall percentage of ads blocked in the previous 24-hour timeframe is represented by the number of red pixels displayed. 
+
+- Additional options include specifying the orientation of the display and low-light mode.  
 
 - Each option corresponds to a joystick direction that can alter program behavior while running.  
 
@@ -31,11 +33,8 @@ Show this help message and exit.
 `-i {10, 30, 60, 120}, --interval {10, 30, 60, 120}`  
 Specify interval time in minutes. Defaults to one hour.
 
-`-c {basic, traffic, ads, alternate}, --color {basic, traffic, ads, alternate}`  
-Specify 'basic' to generate the default red chart, 'traffic' to represent the level of network traffic, 'ads' to represent the percentage of ads blocked, or 'alternate' to switch between traffic level and ad block percentage.  
-
-`-r, --ripple`  
-Generates a ripple effect when producing the chart.  
+`-c {basic, traffic, ads}, --color {basic, traffic, ads}`  
+Specify 'basic' to generate the default red chart, 'traffic' to represent the level of network traffic, or 'ads' to represent the percentage of ads blocked.    
 
 `-a ADDRESS, --address ADDRESS`  
 Specify address of dns server, defaults to localhost.
@@ -57,10 +56,7 @@ Cycle interval selection.
 Toggle low-light mode.  
 
 - _LEFT - PUSH_  
-Cycle display orientation.
-
-- _MIDDLE - PUSH_  
-Enable ripple effect.  
+Cycle display orientation.  
 
 - _MIDDLE - HOLD_  
 Exit program.  
