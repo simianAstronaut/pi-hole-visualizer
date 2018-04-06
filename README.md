@@ -4,11 +4,11 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 ![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)  
 
 ### Details  
-- Pi-hole Visualizer alternates between displaying a bar chart of DNS traffic and a spiral graph representing overall percentage of ads blocked.  
+- Pi-hole Visualizer alternates between displaying a bar chart of DNS traffic and a spiral graph representing the daily percentage of ads blocked.  
 
-- Column height in the bar chart represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 2 hours. Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked.  
+- Column height in the bar chart represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 3 hours. Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked.  
 
-- In the spiral graph, the overall percentage of ads blocked in the previous 24-hour timeframe is represented by the number of red pixels displayed. 
+- In the spiral graph, the daily percentage of ads blocked is represented by the number of red pixels displayed. 
 
 - Additional options include specifying the orientation of the display and low-light mode.  
 
