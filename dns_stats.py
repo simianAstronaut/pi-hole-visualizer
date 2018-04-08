@@ -264,6 +264,11 @@ def bar_chart(interval_data, color, orientation, lowlight):
     for i in interval_data:
         info_chart.append([int((i[0] - domain_min) / domain_interval) if domain_interval > 0 \
                            else 0, int((i[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
+
+    #handles cases of incomplete data
+    while len(info_chart) < 8:
+        info_chart.append([0, 0])
+
     info_chart = list(reversed(info_chart[:8]))
 
     SENSE.clear()
