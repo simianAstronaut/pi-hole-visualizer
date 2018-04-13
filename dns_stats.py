@@ -10,6 +10,7 @@ from itertools import cycle
 import json
 import logging
 import os
+import random
 from sense_hat import SenseHat
 import sys
 import time
@@ -57,10 +58,7 @@ def joystick_right_pushed(interval):
 
 
 def joystick_down_pushed(lowlight):
-    if lowlight:
-        lowlight = False
-    else:
-        lowlight = True
+    lowlight = False if lowlight else True
 
     return lowlight
 
@@ -77,6 +75,12 @@ def joystick_left_pushed(orientation):
     orientation = orientation_options[orientation_index]
 
     return orientation
+
+
+def joystick_middle_pushed(randomize):
+    randomize = False if randomize else True
+
+    return randomize
 
 
 def joystick_middle_held():
@@ -203,8 +207,9 @@ def generate_interval_data(raw_data, interval):
     return interval_data
 
 
-def spiral_graph(block_percentage, orientation, lowlight, x=3, y=3):
+def spiral_graph(block_percentage, orientation, lowlight, randomize, x=3, y=3):
     grid_size = 64
+    grid_list = []
     dx = 0
     dy = 1
     pivot_index = 0
@@ -212,15 +217,22 @@ def spiral_graph(block_percentage, orientation, lowlight, x=3, y=3):
 
     grid_units = int(grid_size * block_percentage)
 
-    SENSE.clear()
+    if not randomize:
+        SENSE.clear()
     SENSE.set_rotation(orientation)
     SENSE.low_light = lowlight
 
     for i in range(grid_size):
         if i < grid_units:
-            SENSE.set_pixel(x, 7 - y, (255, 0, 0))
+            if randomize:
+                grid_list.append((x, 7 - y, (255, 0, 0)))
+            else:
+                SENSE.set_pixel(x, 7 - y, (255, 0, 0))
         else:
-            SENSE.set_pixel(x, 7 - y, (0, 0, 255))
+            if randomize:
+                grid_list.append((x, 7 - y, (0, 0, 255)))
+            else:
+                SENSE.set_pixel(x, 7 - y, (0, 0, 255))
 
         time.sleep(RIPPLE_SPEED)
 
@@ -237,8 +249,15 @@ def spiral_graph(block_percentage, orientation, lowlight, x=3, y=3):
         y += dy
         pivot_index += 1
 
+    if randomize:
+        SENSE.clear()
 
-def bar_chart(interval_data, color, orientation, lowlight):
+        for pixel in random.sample(grid_list, grid_size):
+            SENSE.set_pixel(pixel[0], pixel[1], pixel[2])
+            time.sleep(RIPPLE_SPEED)
+
+
+def bar_chart(interval_data, color, orientation, lowlight, randomize):
     info_chart = []
     domain_min = interval_data[0][0]
     domain_max = interval_data[0][0]
@@ -276,9 +295,10 @@ def bar_chart(interval_data, color, orientation, lowlight):
     SENSE.low_light = lowlight
 
     #set pixel values on rgb display
-    for row in range(0, 8):
+    for row in random.sample(range(0, 8), 8) if randomize else range(0, 8):
         if info_chart[row][0] > 0:
-            for col in range(0, info_chart[row][0]):
+            for col in random.sample(range(0, info_chart[row][0]), info_chart[row][0]) if \
+                randomize else range(0, info_chart[row][0]):
                 #if color not set, default to red for all values
                 if color == 'traffic':
                     SENSE.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
@@ -305,9 +325,9 @@ def event_loop(args):
         for _ in range(0, 15):
             mode = next(cycler)
             if  mode == 'bar':
-                bar_chart(interval_data, args.color, args.orientation, args.lowlight)
+                bar_chart(interval_data, args.color, args.orientation, args.lowlight, args.randomize)
             elif mode == 'spiral':
-                spiral_graph(block_percentage, args.orientation, args.lowlight)
+                spiral_graph(block_percentage, args.orientation, args.lowlight, args.randomize)
 
             for _ in range(0, 2):
                 events = SENSE.stick.get_events()
@@ -330,6 +350,10 @@ def event_loop(args):
                     elif last_event.direction == 'left':
                         args.orientation = joystick_left_pushed(args.orientation)
                         print("Orientation switched to %d degrees." % args.orientation)
+                        break
+                    elif last_event.direction == 'middle' and last_event.action != 'held':
+                        args.randomize = joystick_middle_pushed(args.randomize)
+                        print("Randomization", "enabled." if args.randomize else "disabled.")
                         break
                     elif last_event.direction == 'middle' and last_event.action == 'held':
                         joystick_middle_held()
@@ -356,6 +380,8 @@ def main():
                         type=int, default='0', help="rotate graph to match orientation of RPi")
     parser.add_argument('-ll', '--lowlight', action="store_true", help="set LED matrix to \
                         light mode for use in dark environments")
+    parser.add_argument('-r', '--randomize', action="store_true", help="randomize generation of \
+                        charts")
 
     args = parser.parse_args()
 
