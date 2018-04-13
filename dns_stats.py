@@ -235,7 +235,8 @@ def spiral_graph(block_percentage, orientation, lowlight, randomize, x=3, y=3):
             else:
                 SENSE.set_pixel(x, 7 - y, (0, 0, 255))
 
-        time.sleep(RIPPLE_SPEED)
+        if not randomize:
+            time.sleep(RIPPLE_SPEED)
 
         if pivot_index == pivot_point:
             if dx == 0:
