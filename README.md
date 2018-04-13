@@ -45,6 +45,9 @@ Specify orientation of display so that RPi may be installed in non-default orien
 `-ll, --lowlight`  
 Lower LED matrix brightness for use in low light environments.  
 
+`-r, --randomize`  
+Randomize generation of charts.  
+
 #### Joystick Controls  
 - _UP - PUSH_  
 Cycle color mode.  
@@ -57,6 +60,9 @@ Toggle low-light mode.
 
 - _LEFT - PUSH_  
 Cycle display orientation.  
+
+- _MIDDLE - PUSH_  
+Randomize chart generation.  
 
 - _MIDDLE - HOLD_  
 Exit program.  
