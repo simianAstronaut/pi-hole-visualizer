@@ -354,7 +354,7 @@ def event_loop(args):
                         args.orientation = joystick_left_pushed(args.orientation)
                         print("Orientation switched to %d degrees." % args.orientation)
                         break
-                    elif last_event.direction == 'middle' and last_event.action != 'held':
+                    elif last_event.direction == 'middle' and last_event.action == 'released':
                         args.randomize = joystick_middle_pushed(args.randomize)
                         print("Randomization", "enabled." if args.randomize else "disabled.")
                         break
