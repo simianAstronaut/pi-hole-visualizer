@@ -11,10 +11,11 @@ import json
 import logging
 import os
 import random
-from sense_hat import SenseHat
 import sys
 import time
 import urllib.request
+
+from sense_hat import SenseHat
 
 SENSE = SenseHat()
 RIPPLE_SPEED = 0.025
@@ -325,7 +326,8 @@ def event_loop(args):
         for _ in range(0, 15):
             mode = next(cycler)
             if  mode == 'bar':
-                bar_chart(interval_data, args.color, args.orientation, args.lowlight, args.randomize)
+                bar_chart(interval_data, args.color, args.orientation, args.lowlight, \
+                          args.randomize)
             elif mode == 'spiral':
                 spiral_graph(block_percentage, args.orientation, args.lowlight, args.randomize)
 
@@ -380,8 +382,8 @@ def main():
                         type=int, default='0', help="rotate graph to match orientation of RPi")
     parser.add_argument('-ll', '--lowlight', action="store_true", help="set LED matrix to \
                         light mode for use in dark environments")
-    parser.add_argument('-r', '--randomize', action="store_true", help="randomize generation of \
-                        charts")
+    parser.add_argument('-r', '--randomize', action="store_true", help="randomize order of \
+                        pixels displayed")
 
     args = parser.parse_args()
 

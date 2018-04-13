@@ -46,7 +46,7 @@ Specify orientation of display so that RPi may be installed in non-default orien
 Lower LED matrix brightness for use in low light environments.  
 
 `-r, --randomize`  
-Randomize generation of charts.  
+Randomize order of pixels displayed.  
 
 #### Joystick Controls  
 - _UP - PUSH_  
