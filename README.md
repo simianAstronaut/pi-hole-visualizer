@@ -62,7 +62,7 @@ Toggle low-light mode.
 Cycle display orientation.  
 
 - _MIDDLE - PUSH_  
-Randomize chart generation.  
+Toggle randomization of pixel generation.  
 
 - _MIDDLE - HOLD_  
 Exit program.  
