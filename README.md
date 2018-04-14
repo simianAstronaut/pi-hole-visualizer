@@ -10,7 +10,7 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 
 - In the spiral graph, the daily percentage of ads blocked is represented by the number of red pixels displayed. 
 
-- Additional options include specifying the orientation of the display and low-light mode.  
+- Options include randomization of pixel generation, specifying the orientation of the display, and low-light mode.  
 
 - Each option corresponds to a joystick direction that can alter program behavior while running.  
 
