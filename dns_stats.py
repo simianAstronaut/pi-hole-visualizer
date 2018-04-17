@@ -9,8 +9,10 @@ import argparse
 from itertools import cycle
 import json
 import logging
+import operator
 import os
 import random
+import re
 import sys
 import time
 import urllib.request
@@ -108,11 +110,12 @@ def color_dict(level):
     }[level]
 
 
-def api_request(address):
+def api_request(address, pw_hash):
     if not hasattr(api_request, "initial_connection"):
         api_request.initial_connection = True
     max_attempts = 300 if api_request.initial_connection else 30
     attempts = 0
+    query = "?summary&overTimeData10mins&getQueryTypes&getQuerySources&auth=%s" % pw_hash
 
     #retrieve and decode json data from server
     while True:
@@ -121,8 +124,7 @@ def api_request(address):
                 if os.geteuid() == 0:
                     LOGGER.info('Initiating connection with server.')
                 print('Initiating connection with server.')
-            with urllib.request.urlopen("http://%s/admin/api.php?summary&overTimeData10mins" % \
-            address) as url:
+            with urllib.request.urlopen("http://%s/admin/api.php%s" % (address, query)) as url:
                 attempts += 1
                 raw_data = json.loads(url.read().decode())
                 break
@@ -141,7 +143,8 @@ def api_request(address):
             print("Error: Invalid address for DNS server. Try again.")
             sys.exit(1)
 
-    if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data:
+    if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data or \
+       'ads_percentage_today' not in raw_data:
         if os.geteuid() == 0:
             LOGGER.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
         print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
@@ -208,6 +211,60 @@ def generate_interval_data(raw_data, interval):
     return interval_data
 
 
+def bar_chart_vertical(interval_data, color, orientation, lowlight, randomize):
+    info_chart = []
+    domain_min = interval_data[0][0]
+    domain_max = interval_data[0][0]
+    ad_min = interval_data[0][1]
+    ad_max = interval_data[0][1]
+
+    #calculate minimum, maximum, and interval values to scale graph appropriately
+    for i in interval_data:
+        if i[0] > domain_max:
+            domain_max = i[0]
+        elif i[0] < domain_min:
+            domain_min = i[0]
+
+        if i[1] > ad_max:
+            ad_max = i[1]
+        elif i[1] < ad_min:
+            ad_min = i[1]
+
+    domain_interval = (domain_max - domain_min) / 8
+    ad_interval = (ad_max - ad_min) / 8
+
+    #append scaled values to new list
+    for i in interval_data:
+        info_chart.append([int((i[0] - domain_min) / domain_interval) if domain_interval > 0 \
+                           else 0, int((i[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
+
+    #handles cases of incomplete data
+    while len(info_chart) < 8:
+        info_chart.append([0, 0])
+
+    info_chart = list(reversed(info_chart[:8]))
+
+    SENSE.clear()
+    SENSE.set_rotation(orientation)
+    SENSE.low_light = lowlight
+
+    #set pixel values on rgb display
+    for col in random.sample(range(0, 8), 8) if randomize else range(0, 8):
+        if info_chart[col][0] > 0:
+            for row in random.sample(range(0, info_chart[col][0]), info_chart[col][0]) if \
+                randomize else range(0, info_chart[col][0]):
+                #if color not set, default to red for all values
+                if color == 'traffic':
+                    SENSE.set_pixel(col, 7 - row, color_dict(info_chart[col][0]))
+                    time.sleep(RIPPLE_SPEED)
+                elif color == 'ads':
+                    SENSE.set_pixel(col, 7 - row, color_dict(info_chart[col][1]))
+                    time.sleep(RIPPLE_SPEED)
+                elif color == 'basic':
+                    SENSE.set_pixel(col, 7 - row, (255, 0, 0))
+                    time.sleep(RIPPLE_SPEED)
+
+
 def spiral_graph(block_percentage, orientation, lowlight, randomize, x=3, y=3):
     grid_size = 64
     grid_list = []
@@ -256,41 +313,28 @@ def spiral_graph(block_percentage, orientation, lowlight, randomize, x=3, y=3):
 
         for pixel in random.sample(grid_list, grid_size):
             SENSE.set_pixel(pixel[0], pixel[1], pixel[2])
+
             time.sleep(RIPPLE_SPEED)
 
 
-def bar_chart(interval_data, color, orientation, lowlight, randomize):
+def bar_chart_horizontal(top_sources, orientation, lowlight, randomize):
+    source_list = []
     info_chart = []
-    domain_min = interval_data[0][0]
-    domain_max = interval_data[0][0]
-    ad_min = interval_data[0][1]
-    ad_max = interval_data[0][1]
 
-    #calculate minimum, maximum, and interval values to scale graph appropriately
-    for i in interval_data:
-        if i[0] > domain_max:
-            domain_max = i[0]
-        elif i[0] < domain_min:
-            domain_min = i[0]
+    if len(top_sources) > 0:
+        for source in sorted(top_sources.items(), key=operator.itemgetter(1), reverse=True):
+            source_list.append(source[1])
 
-        if i[1] > ad_max:
-            ad_max = i[1]
-        elif i[1] < ad_min:
-            ad_min = i[1]
+        source_max = source_list[0]
+        source_min = source_list[-1] if len(source_list) > 1 else 0
+        source_interval = (source_max - source_min) / 8
 
-    domain_interval = (domain_max - domain_min) / 8
-    ad_interval = (ad_max - ad_min) / 8
-
-    #append scaled values to new list
-    for i in interval_data:
-        info_chart.append([int((i[0] - domain_min) / domain_interval) if domain_interval > 0 \
-                           else 0, int((i[1] - ad_min) / ad_interval) if ad_interval > 0 else 0])
+        for source in source_list:
+            info_chart.append(int((source - source_min) / source_interval))
 
     #handles cases of incomplete data
     while len(info_chart) < 8:
-        info_chart.append([0, 0])
-
-    info_chart = list(reversed(info_chart[:8]))
+        info_chart.append(0)
 
     SENSE.clear()
     SENSE.set_rotation(orientation)
@@ -298,45 +342,105 @@ def bar_chart(interval_data, color, orientation, lowlight, randomize):
 
     #set pixel values on rgb display
     for row in random.sample(range(0, 8), 8) if randomize else range(0, 8):
-        if info_chart[row][0] > 0:
-            for col in random.sample(range(0, info_chart[row][0]), info_chart[row][0]) if \
-                randomize else range(0, info_chart[row][0]):
-                #if color not set, default to red for all values
-                if color == 'traffic':
-                    SENSE.set_pixel(row, 7 - col, color_dict(info_chart[row][0]))
-                    time.sleep(RIPPLE_SPEED)
-                elif color == 'ads':
-                    SENSE.set_pixel(row, 7 - col, color_dict(info_chart[row][1]))
-                    time.sleep(RIPPLE_SPEED)
-                elif color == 'basic':
-                    SENSE.set_pixel(row, 7 - col, (255, 0, 0))
-                    time.sleep(RIPPLE_SPEED)
+        if info_chart[row] > 0:
+            for col in random.sample(range(0, info_chart[row]), info_chart[row]) if \
+                randomize else range(0, info_chart[row]):
+                SENSE.set_pixel(col, row, color_dict(info_chart[row]))
+                time.sleep(RIPPLE_SPEED)
 
 
-def event_loop(args):
-    modes = ('bar', 'spiral')
+def pie_chart(ipv4_percentage, orientation, lowlight, randomize):
+    grid_size = 64
+    grid_list = []
+    grid_units = int(grid_size * ipv4_percentage)
+    counter = 0
+
+    if not randomize:
+        SENSE.clear()
+    SENSE.set_rotation(orientation)
+    SENSE.low_light = lowlight
+
+    for row in range(0, 8):
+        for col in range(4, 8):
+            if counter < grid_units:
+                if randomize:
+                    grid_list.append((col, row, (255, 128, 0)))
+                else:
+                    SENSE.set_pixel(col, row, (255, 128, 0))
+            else:
+                if randomize:
+                    grid_list.append((col, row, (128, 255, 0)))
+                else:
+                    SENSE.set_pixel(col, row, (128, 255, 0))
+
+            if not randomize:
+                time.sleep(RIPPLE_SPEED)
+
+            counter += 1
+
+    for row in range(7, -1, -1):
+        for col in range(3, -1, -1):
+            if counter < grid_units:
+                if randomize:
+                    grid_list.append((col, row, (255, 128, 0)))
+                else:
+                    SENSE.set_pixel(col, row, (255, 128, 0))
+            else:
+                if randomize:
+                    grid_list.append((col, row, (128, 255, 0)))
+                else:
+                    SENSE.set_pixel(col, row, (128, 255, 0))
+
+            if not randomize:
+                time.sleep(RIPPLE_SPEED)
+
+            counter += 1
+
+    if randomize:
+        SENSE.clear()
+
+        for pixel in random.sample(grid_list, grid_size):
+            SENSE.set_pixel(pixel[0], pixel[1], pixel[2])
+
+            time.sleep(RIPPLE_SPEED)
+
+
+def event_loop(args, pw_hash):
+    modes = ['vertical', 'spiral']
     cycler = cycle(modes)
 
     while True:
         joystick_event = False
 
-        raw_data = api_request(args.address)
-        block_percentage = float(raw_data['ads_percentage_today']) / 100
+        raw_data = api_request(args.address, pw_hash)
         interval_data = generate_interval_data(raw_data, args.interval)
+        block_percentage = float(raw_data['ads_percentage_today']) / 100
+
+        if 'top_sources' in raw_data and 'querytypes' in raw_data:
+            if len(modes) != 4:
+                modes.extend(['horizontal', 'pie'])
+
+            ipv4_percentage = float(raw_data['querytypes']['A (IPv4)']) / 100
 
         for _ in range(0, 15):
             mode = next(cycler)
-            if  mode == 'bar':
-                bar_chart(interval_data, args.color, args.orientation, args.lowlight, \
+            if  mode == 'vertical':
+                bar_chart_vertical(interval_data, args.color, args.orientation, args.lowlight, \
                           args.randomize)
             elif mode == 'spiral':
                 spiral_graph(block_percentage, args.orientation, args.lowlight, args.randomize)
+            elif mode == 'horizontal':
+                bar_chart_horizontal(raw_data['top_sources'], args.orientation, args.lowlight, \
+                                     args.randomize)
+            elif mode == 'pie':
+                pie_chart(ipv4_percentage, args.orientation, args.lowlight, args.randomize)
 
             for _ in range(0, 2):
                 events = SENSE.stick.get_events()
                 if events:
                     joystick_event = True
                     last_event = events[-1]
+
                     if last_event.direction == 'up':
                         args.color = joystick_up_pushed(args.color)
                         print("Color mode switched to '%s'." % args.color.capitalize())
@@ -367,6 +471,53 @@ def event_loop(args):
                 break
 
 
+def parse_config(config_path):
+    pw_hash = ''
+
+    with open(config_path, 'r') as fp:
+        try:
+            for line in fp:
+                hex_pattern = re.compile(r'WEBPASSWORD=([0-9a-fA-F]+)')
+                match = re.match(hex_pattern, line)
+                if match:
+                    pw_hash = match.group(1)
+                    return pw_hash
+        except Exception:
+            return pw_hash
+
+
+def retrieve_hash(address):
+    pw_hash = ''
+
+    if address == '127.0.0.1':
+        config_path = '/etc/pihole/setupVars.conf'
+
+        if os.getegid() != 0:
+            return pw_hash
+        else:
+            if os.path.exists(config_path):
+                return parse_config(config_path)
+            else:
+                if os.geteuid() == 0:
+                    LOGGER.error("Pi-hole configuration file not found in default location '%s'." \
+                                 % config_path)
+                print("Pi-hole configuration file not found in default location '%s'." \
+                      % config_path)
+
+                return pw_hash
+    else:
+        config_path = os.path.join(os.getcwd(), '.setupVars.conf')
+
+        if os.path.exists(config_path):
+            return parse_config(config_path)
+        else:
+            if os.geteuid() == 0:
+                LOGGER.warning("Local configuration file not found.")
+            print("Local configuration file not found.")
+
+            return pw_hash
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generates a chart to display network traffic \
                                      on the Sense-HAT RGB display")
@@ -388,7 +539,9 @@ def main():
 
     args = parser.parse_args()
 
-    event_loop(args)
+    pw_hash = retrieve_hash(args.address)
+
+    event_loop(args, pw_hash)
 
 
 if __name__ == '__main__':

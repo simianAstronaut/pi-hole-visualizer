@@ -37,7 +37,7 @@ Specify interval time in minutes. Defaults to one hour.
 Specify 'basic' to generate the default red chart, 'traffic' to represent the level of network traffic, or 'ads' to represent the percentage of ads blocked.    
 
 `-a ADDRESS, --address ADDRESS`  
-Specify address of dns server, defaults to localhost.
+Specify address of DNS server, defaults to localhost.
 
 `-o {0, 90, 180, 270}, --orientation {0, 90, 180, 270}`  
 Specify orientation of display so that RPi may be installed in non-default orientation.
