@@ -26,6 +26,12 @@ Pi-hole Visualizer is a Python script used to display DNS traffic in a colorful 
 * The Sense-HAT package can be installed with `sudo apt-get install sense-hat`.  
  
 ---  
+
+### Authorization  
+To view statistics regarding top clients and query types, a configuration file containing the password hash is required. If you are running Pi-hole Visualizer on the same machine that is running Pi-hole, no action is required and it is assumed the file is located at (`/etc/pihole/setupVars.conf`). If you are on a remote machine, you can transfer the file from the remote machine to your local repository as a hidden file with:  
+`scp remote_address:etc/pihole/setupVars.conf path_to_local_repository/.setupVars.conf`.  
+
+---  
   
 ### Usage
 **`dns_stats.py [OPTION]`**  
@@ -72,10 +78,6 @@ Toggle randomization.
 Exit program.  
  
 ---  
-
-### Authorization  
-To view statistics regarding top clients and query types, a configuration file containing the password hash is required. If you are running Pi-hole Visualizer on the same machine that is running Pi-hole, it is assumed the file is located at (`/etc/pihole/setupVars.conf`). If you are on a remote machine, you can transfer the file from the remote machine to your local repository as a hidden file with:  
-`scp remote_address:etc/pihole/setupVars.conf path_to_local_repository/.setupVars.conf`.
   
  ### To Install As a System Service  
  1. Make the script and unit file executable:  
