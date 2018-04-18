@@ -4,7 +4,7 @@ Pi-hole Visualizer is a Python script used to display Pi-hole statistics in a co
 ![sense-hat display](https://github.com/simianAstronaut/pi-hole-visualizer/blob/master/images/sense_hat.gif)  
 
 ### Details  
-- Pi-hole Visualizer alternates between displaying one of four different charts at regular intervals.  
+- Pi-hole Visualizer cycles between four different charts at regular intervals.  
 
 - In the vertical bar chart, column height represents the relative level of DNS traffic generated for a specific time interval in the previous 24-hour timeframe. The selected time interval ranges from 10 minutes to 3 hours. Color can be used to represent the intensity of DNS traffic or the percentage of ads blocked.  
 
@@ -28,8 +28,8 @@ Pi-hole Visualizer is a Python script used to display Pi-hole statistics in a co
 ---  
 
 ### Authorization  
-To view statistics regarding top clients and query types, a configuration file containing the password hash is required. If you are running Pi-hole Visualizer on the same machine that is running Pi-hole, no action is required and it is assumed the file is located at (`/etc/pihole/setupVars.conf`). If you are on a remote machine, you can transfer the file from the remote machine to your local repository as a hidden file with:  
-`scp remote_address:etc/pihole/setupVars.conf path_to_local_repository/.setupVars.conf`.  
+To view statistics regarding top clients and query types, a configuration file containing the password hash is required. If you are running Pi-hole Visualizer on the same machine that is running Pi-hole, no action is required and it is assumed the file is located at (`/etc/pihole/setupVars.conf`).  
+If you are on a remote machine, you can transfer the file from the remote machine to your local repository as a hidden file with: `scp remote_address:etc/pihole/setupVars.conf path_to_local_repo/.setupVars.conf`.  
 
 ---  
   
