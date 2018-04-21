@@ -29,7 +29,8 @@ Pi-hole Visualizer displays Pi-hole statistics on the Raspberry Pi Sense-HAT wit
 
 ### Authorization  
 To view statistics regarding top clients and query types, authorization from the Pi-hole web server is required. If you are running Pi-hole Visualizer on the same machine that is running Pi-hole, it is assumed a configuration file containing the password hash is located at (`/etc/pihole/setupVars.conf`) and no action is required.  
-If you are on a remote machine, you can enable authorization by creating an environment variable containing the password hash. Append the following line to (`~/.bash_profile`) or (`~/.profile`): `export WEBPASSWORD="hash_value"`.
+If you are on a remote machine, you can enable authorization by creating an environment variable containing the password hash. Append the following line to (`~/.bash_profile`) or (`~/.profile`): `export WEBPASSWORD="hash_value"`.  
+
 ---  
   
 ### Usage
