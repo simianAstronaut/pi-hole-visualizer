@@ -139,15 +139,16 @@ def api_request(address, pw_hash):
                 sys.exit(1)
         except urllib.error.URLError:
             if os.geteuid() == 0:
-                LOGGER.error('Invalid address for DNS server.')
-            print("Error: Invalid address for DNS server. Try again.")
+                LOGGER.error('Web server offline or invalid address entered.')
+            print("Error: Web server offline or invalid address entered.")
             sys.exit(1)
 
     if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data or \
        'ads_percentage_today' not in raw_data:
         if os.geteuid() == 0:
-            LOGGER.error('Invalid data returned from server. Ensure pihole-FTL service is running.')
-        print('Error: Invalid data returned from server. Ensure pihole-FTL service is running.')
+            LOGGER.error('Invalid data returned from server. Check if pihole-FTL service is \
+                         running.')
+        print('Error: Invalid data returned from server. Check if pihole-FTL service is running.')
         sys.exit(1)
 
     if api_request.initial_connection:
@@ -414,12 +415,12 @@ def event_loop(args, pw_hash):
 
         raw_data = api_request(args.address, pw_hash)
         interval_data = generate_interval_data(raw_data, args.interval)
+
         block_percentage = float(raw_data['ads_percentage_today']) / 100
 
         if 'top_sources' in raw_data and 'querytypes' in raw_data:
             if len(modes) != 4:
                 modes.extend(['horizontal', 'pie'])
-
             ipv4_percentage = float(raw_data['querytypes']['A (IPv4)']) / 100
 
         for _ in range(0, 15):
@@ -506,16 +507,16 @@ def retrieve_hash(address):
 
                 return pw_hash
     else:
-        config_path = os.path.join(os.getcwd(), '.setupVars.conf')
+        env_pw = os.environ.get("WEBPASSWORD", None)
 
-        if os.path.exists(config_path):
-            return parse_config(config_path)
-        else:
+        if env_pw is None:
             if os.geteuid() == 0:
-                LOGGER.warning("Local configuration file not found.")
-            print("Local configuration file not found.")
+                LOGGER.warning("Environment variable containing password hash could not be found.")
+            print("Environment variable containing password hash could not be found.")
+        else:
+            pw_hash = env_pw
 
-            return pw_hash
+        return pw_hash
 
 
 def main():
@@ -525,9 +526,9 @@ def main():
     parser.add_argument('-i', '--interval', action="store", choices=[10, 30, 60, 120, 180], \
                         type=int, default='60', help="specify interval time in minutes")
     parser.add_argument('-c', '--color', action="store", choices=['basic', 'traffic', 'ads'], \
-                        default='basic', help="specify 'basic' to generate the default red \
-                        chart, 'traffic' to represent the intensity of network traffic, or \
-                        'ads' to represent the percentage of ads blocked")
+                        default='basic', help="specify 'basic' to generate bar charts in the \
+                        default red color, 'traffic' to color code based on level of DNS queries, \
+                        or 'ads' to color code by ad block percentage.")
     parser.add_argument('-a', '--address', action="store", default='127.0.0.1', help="specify \
                         address of DNS server, defaults to localhost")
     parser.add_argument('-o', '--orientation', action="store", choices=[0, 90, 180, 270], \
