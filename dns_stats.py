@@ -113,7 +113,7 @@ def color_dict(level):
 def api_request(address, pw_hash):
     if not hasattr(api_request, "initial_connection"):
         api_request.initial_connection = True
-    max_attempts = 300 if api_request.initial_connection else 30
+    max_attempts = 100 if api_request.initial_connection else 10
     attempts = 0
     query = "?summary&overTimeData10mins&getQueryTypes&getQuerySources&auth=%s" % pw_hash
 
@@ -141,7 +141,12 @@ def api_request(address, pw_hash):
             if os.geteuid() == 0:
                 LOGGER.error('Web server offline or invalid address entered.')
             print("Error: Web server offline or invalid address entered.")
-            sys.exit(1)
+
+            if attempts < max_attempts:
+                time.sleep(1)
+                continue
+            else:
+                sys.exit(1)
 
     if 'domains_over_time' not in raw_data or 'ads_over_time' not in raw_data or \
        'ads_percentage_today' not in raw_data:
