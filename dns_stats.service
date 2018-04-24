@@ -1,9 +1,10 @@
 [Unit]
 Description=Pi-hole Visualizer Service
+After=pihole-FTL.service lighttpd.service
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/pi/pi-hole-visualizer/dns_stats.py -c ads
+ExecStart=/home/pi/pi-hole-visualizer/dns_stats.py -c ads -i 180
 
 [Install]
 WantedBy=multi-user.target
