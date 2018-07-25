@@ -13,11 +13,15 @@ import operator
 import os
 import random
 import re
+import socket
 import sys
 import time
 import urllib.request
 
-from sense_hat import SenseHat
+from sense_emu import SenseHat
+
+import joystick
+
 
 SENSE = SenseHat()
 RIPPLE_SPEED = 0.025
@@ -32,70 +36,6 @@ if os.geteuid() == 0:
     LOGGER.addHandler(HANDLER)
 
 
-def joystick_up_pushed(color):
-    color_options = ('basic', 'traffic', 'ads')
-    color_index = color_options.index(color)
-
-    if color_index == 2:
-        color_index = 0
-    else:
-        color_index += 1
-
-    color = color_options[color_index]
-
-    return color
-
-
-def joystick_right_pushed(interval):
-    interval_options = (10, 30, 60, 120, 180)
-    interval_index = interval_options.index(interval)
-
-    if interval_index == 4:
-        interval_index = 0
-    else:
-        interval_index += 1
-
-    interval = interval_options[interval_index]
-
-    return interval
-
-
-def joystick_down_pushed(lowlight):
-    lowlight = False if lowlight else True
-
-    return lowlight
-
-
-def joystick_left_pushed(orientation):
-    orientation_options = (0, 90, 180, 270)
-    orientation_index = orientation_options.index(orientation)
-
-    if orientation_index == 3:
-        orientation_index = 0
-    else:
-        orientation_index += 1
-
-    orientation = orientation_options[orientation_index]
-
-    return orientation
-
-
-def joystick_middle_pushed(randomize):
-    randomize = False if randomize else True
-
-    return randomize
-
-
-def joystick_middle_held():
-    if os.geteuid() == 0:
-        LOGGER.info('Program terminated by user.')
-    print('Program terminated by user.')
-
-    SENSE.clear()
-
-    sys.exit()
-
-
 def color_dict(level):
     return {
         0 : (0, 0, 255),
@@ -108,6 +48,20 @@ def color_dict(level):
         7 : (255, 128, 0),
         8 : (255, 0, 0),
     }[level]
+
+
+def global_access(host="8.8.8.8", port=53, timeout=3):
+    """
+    Host: 8.8.8.8 (Google Public DNS A)
+    Port: 53/TCP
+    Service: domain
+    """
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except Exception:
+        return False
 
 
 def api_request(address, pw_hash):
@@ -215,6 +169,31 @@ def generate_interval_data(raw_data, interval):
         interval_data = interval_data[:8]
 
     return interval_data
+
+
+def connectivity_icon(status, orientation, lowlight, randomize):
+    color = (0, 255, 0) if status else (255, 0, 0)
+    icon = [
+        [1, 2, 3, 4, 5, 6],
+        [0, 7],
+        [2, 3, 4, 5],
+        [1, 6],
+        [3, 4],
+        [2, 5],
+        [3, 4]
+    ]
+
+    SENSE.clear()
+    SENSE.set_rotation(orientation)
+    SENSE.low_light = lowlight
+
+    for row in random.sample(range(0, 7), 7) if randomize else range(6, -1, -1):
+        for col in random.sample(icon[row], len(icon[row])) if randomize else icon[row]:
+            SENSE.set_pixel(col, row, color)
+            if randomize:
+                time.sleep(RIPPLE_SPEED)
+        if not randomize:
+            time.sleep(RIPPLE_SPEED * 8)
 
 
 def bar_chart_vertical(interval_data, color, orientation, lowlight, randomize):
@@ -412,12 +391,13 @@ def pie_chart(ipv4_percentage, orientation, lowlight, randomize):
 
 
 def event_loop(args, pw_hash):
-    modes = ['vertical', 'spiral']
+    modes = ['icon', 'vertical', 'spiral']
     cycler = cycle(modes)
 
     while True:
         joystick_event = False
 
+        status = global_access()
         raw_data = api_request(args.address, pw_hash)
         interval_data = generate_interval_data(raw_data, args.interval)
 
@@ -430,7 +410,9 @@ def event_loop(args, pw_hash):
 
         for _ in range(0, 15):
             mode = next(cycler)
-            if  mode == 'vertical':
+            if  mode == 'icon':
+                connectivity_icon(status, args.orientation, args.lowlight, args.randomize)
+            elif  mode == 'vertical':
                 bar_chart_vertical(interval_data, args.color, args.orientation, args.lowlight, \
                           args.randomize)
             elif mode == 'spiral':
@@ -448,28 +430,28 @@ def event_loop(args, pw_hash):
                     last_event = events[-1]
 
                     if last_event.direction == 'up':
-                        args.color = joystick_up_pushed(args.color)
+                        args.color = joystick.up_pushed(args.color)
                         print("Color mode switched to '%s'." % args.color.capitalize())
                         break
                     elif last_event.direction == 'right':
-                        args.interval = joystick_right_pushed(args.interval)
+                        args.interval = joystick.right_pushed(args.interval)
                         print("Time interval switched to %d minutes." % args.interval)
                         break
                     elif last_event.direction == 'down':
-                        args.lowlight = joystick_down_pushed(args.lowlight)
+                        args.lowlight = joystick.down_pushed(args.lowlight)
                         print("Low-light mode", "enabled." if args.lowlight else \
                               "disabled.")
                         break
                     elif last_event.direction == 'left':
-                        args.orientation = joystick_left_pushed(args.orientation)
+                        args.orientation = joystick.left_pushed(args.orientation)
                         print("Orientation switched to %d degrees." % args.orientation)
                         break
                     elif last_event.direction == 'middle' and last_event.action == 'released':
-                        args.randomize = joystick_middle_pushed(args.randomize)
+                        args.randomize = joystick.middle_pushed(args.randomize)
                         print("Randomization", "enabled." if args.randomize else "disabled.")
                         break
                     elif last_event.direction == 'middle' and last_event.action == 'held':
-                        joystick_middle_held()
+                        joystick.middle_held()
 
                 time.sleep(1)
 
