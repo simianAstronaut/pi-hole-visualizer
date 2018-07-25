@@ -22,7 +22,6 @@ from sense_hat import SenseHat
 
 import joystick
 
-
 SENSE = SenseHat()
 RIPPLE_SPEED = 0.025
 
