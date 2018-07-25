@@ -18,7 +18,7 @@ import sys
 import time
 import urllib.request
 
-from sense_emu import SenseHat
+from sense_hat import SenseHat
 
 import joystick
 
