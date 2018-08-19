@@ -61,7 +61,7 @@ Lower LED matrix brightness for use in low light environments.
 Randomize order of pixels displayed.  
 
 `-s {1, 2, 3, 4, 5}, --select {1, 2, 3, 4, 5}`  
-Specify which animations to display, with multiple items separated by a space.  
+Specify which animation(s) to display, with multiple items separated by a space.  
 
 #### Joystick Controls  
 - _UP - PUSH_  
