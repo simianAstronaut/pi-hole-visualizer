@@ -16,11 +16,11 @@ Pi-hole Visualizer displays Pi-hole statistics on the Raspberry Pi Sense-HAT wit
 
 - The last animation(pie chart) displays the proportion of IPV4(orange pixels) to IPV6(green pixels) queries.  
 
-- Options include randomization of pixel generation, specifying the orientation of the display, and low-light mode.  
+- Options include manual chart selection, randomization of pixel generation, specifying the orientation of the display, and low-light mode.  
 
 - Joystick controls allow for adjustment of program options interactively.  
 
-- Pi-hole Visualizer is either manually run from the command line or enabled as a systemd service to run automatically at boot.  
+- Pi-hole Visualizer is either run from the command line or enabled as a systemd service to run automatically at boot.  
 ---  
   
 ### Requirements
@@ -46,7 +46,7 @@ Show this help message and exit.
 Specify interval time in minutes. Defaults to one hour.
 
 `-c {basic, traffic, ads}, --color {basic, traffic, ads}`  
-Specify 'basic' to generate bar charts in the default red color, 'traffic' to color code based on level of DNS queries, or 'ads' to color code by ad block percentage.
+Enter 'basic' to generate bar charts in the default red color, 'traffic' to color code based on level of DNS queries, or 'ads' to color code by ad block percentage.
 
 `-a ADDRESS, --address ADDRESS`  
 Specify address of DNS server, defaults to localhost.
@@ -59,6 +59,9 @@ Lower LED matrix brightness for use in low light environments.
 
 `-r, --randomize`  
 Randomize order of pixels displayed.  
+
+`-s, --select`  
+Specify which animations to display(1-5), with multiple items separated by a space.  
 
 #### Joystick Controls  
 - _UP - PUSH_  

@@ -3,6 +3,11 @@ Pi-hole DNS traffic visualizer for the Raspberry Pi Sense HAT
 By Sam Lindley, 2/21/2018
 '''
 
+import os
+import sys
+
+import config
+
 def up_pushed(color):
     color_options = ('basic', 'traffic', 'ads')
     color_index = color_options.index(color)
@@ -59,9 +64,9 @@ def middle_pushed(randomize):
 
 def middle_held():
     if os.geteuid() == 0:
-        LOGGER.info('Program terminated by user.')
+        config.LOGGER.info('Program terminated by user.')
     print('Program terminated by user.')
 
-    SENSE.clear()
+    config.SENSE.clear()
 
     sys.exit()
