@@ -198,7 +198,7 @@ def spiral_graph(block_percentage, orientation, lowlight, randomize, x=3, y=3):
             time.sleep(config.RIPPLE_SPEED)
 
 
-def bar_chart_horizontal(top_sources, orientation, lowlight, randomize):
+def bar_chart_horizontal(top_sources, color, orientation, lowlight, randomize):
     source_list = []
     info_chart = []
 
@@ -226,15 +226,32 @@ def bar_chart_horizontal(top_sources, orientation, lowlight, randomize):
         if info_chart[row] > 0:
             for col in random.sample(range(0, info_chart[row]), info_chart[row]) if \
                 randomize else range(0, info_chart[row]):
-                config.SENSE.set_pixel(col, row, utils.color_dict(info_chart[row]))
+                if color == 'basic':
+                    config.SENSE.set_pixel(col, row, (255, 0, 0))
+                else:
+                    config.SENSE.set_pixel(col, row, utils.color_dict(info_chart[row]))
                 time.sleep(config.RIPPLE_SPEED)
 
 
-def pie_chart(ipv4_percentage, orientation, lowlight, randomize):
+def pie_chart(query_types, orientation, lowlight, randomize):
+    query_colors = {
+        "A (IPv4)": (0, 26, 65),        #navy
+        "AAAA (IPv6)": (0, 180, 251),   #sky blue
+        "ANY": (255, 132, 34),          #orange
+        "SRV": (250, 101, 96),          #pink
+        "SOA": (67, 108, 52),           #moss green
+        "PTR": (142, 58, 137),          #purple
+        "TXT": (255, 255, 255),         #white
+    }
+    query_types = query_types.copy()
     grid_size = 64
     grid_list = []
-    grid_units = int(grid_size * ipv4_percentage)
     counter = 0
+
+    for category in query_types:
+        query_types[category] = int((query_types[category] / 100) * grid_size)
+
+    current_type = max(query_types, key=query_types.get)
 
     if not randomize:
         config.SENSE.clear()
@@ -243,34 +260,51 @@ def pie_chart(ipv4_percentage, orientation, lowlight, randomize):
 
     for row in range(0, 8):
         for col in range(4, 8):
-            if counter < grid_units:
+            if counter < query_types[current_type]:
                 if randomize:
-                    grid_list.append((col, row, (255, 128, 0)))
+                    grid_list.append((col, row, query_colors[current_type]))
                 else:
-                    config.SENSE.set_pixel(col, row, (255, 128, 0))
+                    config.SENSE.set_pixel(col, row, query_colors[current_type])
+                last_valid = current_type
             else:
+                del query_types[current_type]
+                counter = 0
+                if query_types:
+                    current_type = max(query_types, key=query_types.get)
+
                 if randomize:
-                    grid_list.append((col, row, (128, 255, 0)))
+                    grid_list.append((col, row, query_colors[current_type] if \
+                                     query_types[current_type] else query_colors[last_valid]))
                 else:
-                    config.SENSE.set_pixel(col, row, (128, 255, 0))
+                    config.SENSE.set_pixel(col, row, query_colors[current_type] if \
+                                           query_types[current_type] else query_colors[last_valid])
 
             if not randomize:
                 time.sleep(config.RIPPLE_SPEED)
 
             counter += 1
 
+
     for row in range(7, -1, -1):
         for col in range(3, -1, -1):
-            if counter < grid_units:
+            if counter < query_types[current_type]:
                 if randomize:
-                    grid_list.append((col, row, (255, 128, 0)))
+                    grid_list.append((col, row, query_colors[current_type]))
                 else:
-                    config.SENSE.set_pixel(col, row, (255, 128, 0))
+                    config.SENSE.set_pixel(col, row, query_colors[current_type])
+                last_valid = current_type
             else:
+                del query_types[current_type]
+                counter = 0
+                if query_types:
+                    current_type = max(query_types, key=query_types.get)
+
                 if randomize:
-                    grid_list.append((col, row, (128, 255, 0)))
+                    grid_list.append((col, row, query_colors[current_type] if \
+                                     query_types[current_type] else query_colors[last_valid]))
                 else:
-                    config.SENSE.set_pixel(col, row, (128, 255, 0))
+                    config.SENSE.set_pixel(col, row, query_colors[current_type] if \
+                                           query_types[current_type] else query_colors[last_valid])
 
             if not randomize:
                 time.sleep(config.RIPPLE_SPEED)
@@ -303,7 +337,6 @@ def event_loop(args, pw_hash):
         if 'top_sources' in raw_data and 'querytypes' in raw_data:
             if len(modes) != 5:
                 modes.extend(['horizontal', 'pie'])
-            ipv4_percentage = float(raw_data['querytypes']['A (IPv4)']) / 100
         else:
             if len(modes) == 5:
                 modes = [mode for mode in modes if mode not in ('horizontal', 'pie')]
@@ -323,14 +356,14 @@ def event_loop(args, pw_hash):
                 connectivity_icon(status, args.orientation, args.lowlight, args.randomize)
             elif  mode == 'vertical':
                 bar_chart_vertical(interval_data, args.color, args.orientation, args.lowlight, \
-                          args.randomize)
+                                   args.randomize)
             elif mode == 'spiral':
                 spiral_graph(block_percentage, args.orientation, args.lowlight, args.randomize)
             elif mode == 'horizontal':
-                bar_chart_horizontal(raw_data['top_sources'], args.orientation, args.lowlight, \
-                                     args.randomize)
+                bar_chart_horizontal(raw_data['top_sources'], args.color, args.orientation, \
+                                     args.lowlight, args.randomize)
             elif mode == 'pie':
-                pie_chart(ipv4_percentage, args.orientation, args.lowlight, args.randomize)
+                pie_chart(raw_data['querytypes'], args.orientation, args.lowlight, args.randomize)
 
             for _ in range(0, 2):
                 events = config.SENSE.stick.get_events()

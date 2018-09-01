@@ -6,7 +6,7 @@ By Sam Lindley, 2/21/2018
 import logging
 import os
 
-from sense_emu import SenseHat
+from sense_hat import SenseHat
 
 SENSE = SenseHat()
 RIPPLE_SPEED = 0.025
