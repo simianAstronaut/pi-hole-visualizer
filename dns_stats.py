@@ -268,9 +268,10 @@ def pie_chart(query_types, orientation, lowlight, randomize):
                 last_valid = current_type
             else:
                 del query_types[current_type]
-                counter = 0
                 if query_types:
                     current_type = max(query_types, key=query_types.get)
+                    if query_types[current_type]:
+                        last_valid = current_type
 
                 if randomize:
                     grid_list.append((col, row, query_colors[current_type] if \
@@ -283,7 +284,6 @@ def pie_chart(query_types, orientation, lowlight, randomize):
                 time.sleep(config.RIPPLE_SPEED)
 
             counter += 1
-
 
     for row in range(7, -1, -1):
         for col in range(3, -1, -1):
@@ -298,6 +298,8 @@ def pie_chart(query_types, orientation, lowlight, randomize):
                 counter = 0
                 if query_types:
                     current_type = max(query_types, key=query_types.get)
+                    if query_types[current_type]:
+                        last_valid = current_type
 
                 if randomize:
                     grid_list.append((col, row, query_colors[current_type] if \
