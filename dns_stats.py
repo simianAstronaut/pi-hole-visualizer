@@ -243,7 +243,6 @@ def pie_chart(query_types, orientation, lowlight, randomize):
         "PTR": (142, 58, 137),          #purple
         "TXT": (255, 255, 255),         #white
     }
-    query_types = query_types.copy()
     grid_size = 64
     grid_list = []
     counter = 0
@@ -365,7 +364,7 @@ def event_loop(args, pw_hash):
                 bar_chart_horizontal(raw_data['top_sources'], args.color, args.orientation, \
                                      args.lowlight, args.randomize)
             elif mode == 'pie':
-                pie_chart(raw_data['querytypes'], args.orientation, args.lowlight, args.randomize)
+                pie_chart(raw_data['querytypes'].copy(), args.orientation, args.lowlight, args.randomize)
 
             for _ in range(0, 2):
                 events = config.SENSE.stick.get_events()
