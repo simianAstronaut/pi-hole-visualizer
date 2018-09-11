@@ -267,6 +267,7 @@ def pie_chart(query_types, orientation, lowlight, randomize):
                 last_valid = current_type
             else:
                 del query_types[current_type]
+                counter = 0
                 if query_types:
                     current_type = max(query_types, key=query_types.get)
                     if query_types[current_type]:
